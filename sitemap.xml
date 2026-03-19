@@ -1,59 +1,59 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>https://xpodev.github.io/mgm/</loc>
+         <loc>https://xpodev.github.io/mver/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/ci/</loc>
+         <loc>https://xpodev.github.io/mver/ci/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/command-resolution/</loc>
+         <loc>https://xpodev.github.io/mver/command-resolution/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/concepts/</loc>
+         <loc>https://xpodev.github.io/mver/concepts/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/file-structure/</loc>
+         <loc>https://xpodev.github.io/mver/file-structure/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/installation/</loc>
+         <loc>https://xpodev.github.io/mver/installation/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/tokens/</loc>
+         <loc>https://xpodev.github.io/mver/tokens/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/workflow/</loc>
+         <loc>https://xpodev.github.io/mver/workflow/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/commands/app/</loc>
+         <loc>https://xpodev.github.io/mver/commands/app/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/commands/config/</loc>
+         <loc>https://xpodev.github.io/mver/commands/config/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/commands/group/</loc>
+         <loc>https://xpodev.github.io/mver/commands/group/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/commands/model/</loc>
+         <loc>https://xpodev.github.io/mver/commands/model/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/commands/pull-push/</loc>
+         <loc>https://xpodev.github.io/mver/commands/pull-push/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
     <url>
-         <loc>https://xpodev.github.io/mgm/commands/utility/</loc>
+         <loc>https://xpodev.github.io/mver/commands/utility/</loc>
          <lastmod>2026-03-19</lastmod>
     </url>
 </urlset>
