@@ -12,7 +12,7 @@
 The recommended way to install MGM globally is with `uv tool`:
 
 ```bash
-uv tool install git+https://github.com/your-org/mgm
+uv tool install git+https://github.com/xpodev/mgm
 ```
 
 After installation, `mgm` is available system-wide:
@@ -42,7 +42,7 @@ uv run mgm --help
 ## Install from Source
 
 ```bash
-git clone https://github.com/your-org/mgm
+git clone https://github.com/xpodev/mgm
 cd mgm
 uv sync --all-groups
 uv run mgm --help

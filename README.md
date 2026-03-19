@@ -11,7 +11,7 @@ Storage and retrieval of actual model files is fully delegated to user-defined s
 Requires Python 3.11+ and [uv](https://docs.astral.sh/uv/).
 
 ```bash
-uv tool install git+https://github.com/your-org/mgm
+uv tool install git+https://github.com/xpodev/mgm
 ```
 
 Or add it as a dev dependency in your monorepo:
