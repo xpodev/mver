@@ -1,0 +1,2 @@
+pull_command: "dvc pull {path}"
+push_command: "dvc push {path}"

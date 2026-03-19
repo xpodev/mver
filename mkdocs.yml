@@ -51,6 +51,7 @@ nav:
   - Reference:
       - Command Tokens: tokens.md
       - Command Resolution: command-resolution.md
+      - Python API: api.md
       - CI Integration: ci.md
 
 markdown_extensions:
