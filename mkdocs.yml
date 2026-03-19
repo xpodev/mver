@@ -1,0 +1,90 @@
+site_name: MGM — Model Group Manager
+site_description: CLI lock-file registry for ML model versions in a monorepo
+site_url: https://your-org.github.io/mgm
+repo_url: https://github.com/your-org/mgm
+repo_name: your-org/mgm
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.tabs.sticky
+    - navigation.sections
+    - navigation.expand
+    - navigation.top
+    - search.highlight
+    - search.share
+    - content.code.copy
+    - content.code.annotate
+    - content.action.edit
+
+nav:
+  - Home: index.md
+  - Getting Started:
+      - Installation: installation.md
+      - Core Concepts: concepts.md
+      - File Structure: file-structure.md
+      - Workflow Example: workflow.md
+  - Commands:
+      - Model: commands/model.md
+      - Group: commands/group.md
+      - App: commands/app.md
+      - Pull & Push: commands/pull-push.md
+      - Config: commands/config.md
+      - Utility: commands/utility.md
+  - Reference:
+      - Command Tokens: tokens.md
+      - Command Resolution: command-resolution.md
+      - CI Integration: ci.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - footnotes
+  - md_in_html
+  - toc:
+      permalink: true
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.tabbed:
+      alternate_style: true
+  - pymdownx.tasklist:
+      custom_checkbox: true
+  - pymdownx.details
+  - pymdownx.emoji:
+      emoji_index: !!python/name:material.extensions.emoji.twemoji
+      emoji_generator: !!python/name:material.extensions.emoji.to_svg
+
+plugins:
+  - search
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/your-org/mgm
