@@ -1,4 +1,4 @@
-"""Tests for mgm app commands."""
+"""Tests for mver app commands."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,13 +7,13 @@ import pytest
 from ruamel.yaml import YAML
 from typer.testing import CliRunner
 
-from mgm.cli import app
+from mver.cli import app
 
 _yaml = YAML()
 
 
 def _write_app_cfg(path: Path, group: str, version: str) -> None:
-    with open(path / "mgm.yml", "w") as f:
+    with open(path / "mver.yml", "w") as f:
         _yaml.dump({"group": group, "version": version}, f)
 
 
@@ -21,8 +21,8 @@ def test_app_use(monorepo: Path, app_dir: Path, runner: CliRunner, monkeypatch: 
     monkeypatch.chdir(app_dir)
     result = runner.invoke(app, ["app", "use", "production@1.0.0"])
     assert result.exit_code == 0, result.output
-    assert (app_dir / "mgm.yml").exists()
-    with open(app_dir / "mgm.yml") as f:
+    assert (app_dir / "mver.yml").exists()
+    with open(app_dir / "mver.yml") as f:
         data = _yaml.load(f)
     assert data["group"] == "production"
     assert str(data["version"]) == "1.0.0"
@@ -52,11 +52,11 @@ def test_app_show(monorepo: Path, app_dir: Path, runner: CliRunner, monkeypatch:
     assert "models/fraud-detector/v2.1.0" in result.output
 
 
-def test_app_show_no_mgm_yml_fails(monorepo: Path, app_dir: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_app_show_no_mver_yml_fails(monorepo: Path, app_dir: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(app_dir)
     result = runner.invoke(app, ["app", "show"])
     assert result.exit_code == 1
-    assert "mgm.yml" in result.output
+    assert "mver.yml" in result.output
 
 
 def test_app_check_valid(monorepo: Path, app_dir: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:

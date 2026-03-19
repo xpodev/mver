@@ -1,4 +1,4 @@
-"""Tests for mgm group commands."""
+"""Tests for mver group commands."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from mgm.cli import app
+from mver.cli import app
 from tests.conftest import read_registry
 
 

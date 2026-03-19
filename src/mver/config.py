@@ -1,11 +1,11 @@
-"""mgm.config.yml read/write."""
+"""mver.config.yml read/write."""
 from __future__ import annotations
 
 from pathlib import Path
 
 from ruamel.yaml import YAML
 
-CONFIG_FILENAME = "mgm.config.yml"
+CONFIG_FILENAME = "mver.config.yml"
 
 _yaml = YAML()
 _yaml.preserve_quotes = True

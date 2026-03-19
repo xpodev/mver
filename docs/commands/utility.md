@@ -2,30 +2,30 @@
 
 ---
 
-## `mgm where`
+## `mver where`
 
 Print the path to the `models.registry.yml` file being used. Resolved by walking up from the current working directory — the same convention as git.
 
 ```bash
-mgm where
+mver where
 ```
 
 Useful for verifying which registry is in scope when working in a deep subdirectory.
 
 ```bash
 $ cd apps/fraud-service/src/handlers
-$ mgm where
+$ mver where
 /home/user/monorepo/models.registry.yml
 ```
 
 ---
 
-## `mgm validate`
+## `mver validate`
 
 Validate the entire `models.registry.yml` for correctness and consistency.
 
 ```bash
-mgm validate
+mver validate
 ```
 
 **Checks performed:**
@@ -55,18 +55,18 @@ Exit code is `1` on failure, making this suitable for CI.
 
 ---
 
-## `mgm diff`
+## `mver diff`
 
 Show which model versions changed between two versions of the same group.
 
 ```bash
-mgm diff <group-name>@<version-a> <group-name>@<version-b>
+mver diff <group-name>@<version-a> <group-name>@<version-b>
 ```
 
 **Example:**
 
 ```bash
-mgm diff production@1.3.0 production@1.4.0
+mver diff production@1.3.0 production@1.4.0
 ```
 
 ```

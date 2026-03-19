@@ -1,4 +1,4 @@
-"""Tests for mgm config commands."""
+"""Tests for mver config commands."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from mgm.cli import app
+from mver.cli import app
 
 
 def test_config_set_pull_command(monorepo: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:

@@ -1,4 +1,4 @@
-"""Shared fixtures for mgm tests."""
+"""Shared fixtures for mver tests."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,7 +7,7 @@ import pytest
 from ruamel.yaml import YAML
 from typer.testing import CliRunner
 
-from mgm.cli import app
+from mver.cli import app
 
 _yaml = YAML()
 _yaml.default_flow_style = False
@@ -62,7 +62,7 @@ def monorepo(tmp_path: Path) -> Path:
     with open(reg_path, "w") as f:
         _yaml.dump(MINIMAL_REGISTRY, f)
 
-    cfg_path = tmp_path / "mgm.config.yml"
+    cfg_path = tmp_path / "mver.config.yml"
     with open(cfg_path, "w") as f:
         _yaml.dump(MINIMAL_CONFIG, f)
 

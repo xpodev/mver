@@ -4,19 +4,19 @@ Execute storage commands for model artifacts.
 
 ---
 
-## `mgm pull`
+## `mver pull`
 
 Pull all model artifacts for the current app's declared group version.
 
 ```bash
-mgm pull
+mver pull
 ```
 
-Must be run from an app directory containing a valid `mgm.yml`.
+Must be run from an app directory containing a valid `mver.yml`.
 
 **Behavior:**
 
-1. Reads `mgm.yml` from the current directory
+1. Reads `mver.yml` from the current directory
 2. Looks up the declared group version in the registry
 3. Resolves the pull command for each pinned model version (see [Command Resolution](../command-resolution.md))
 4. **Validates all commands** before executing any — fails fast if any model version has no resolvable pull command
@@ -25,7 +25,7 @@ Must be run from an app directory containing a valid `mgm.yml`.
 
 ```bash
 cd apps/fraud-service
-mgm pull
+mver pull
 # Pulling 'fraud-detector@2.1.0': dvc pull models/fraud-detector/v2.1.0
 # Pulling 'embedder@0.9.4': dvc pull models/embedder/v0.9.4
 # Pull complete.
@@ -36,22 +36,22 @@ mgm pull
 
 ---
 
-## `mgm push`
+## `mver push`
 
 Push model artifacts for a specific group version.
 
 ```bash
-mgm push <group-name>@<version>
+mver push <group-name>@<version>
 ```
 
-Does **not** require an `mgm.yml` — operates directly on a named group version. Useful for CI pipelines that publish models after training.
+Does **not** require an `mver.yml` — operates directly on a named group version. Useful for CI pipelines that publish models after training.
 
 **Behavior:**
 
-Same sequential execution and pre-validation as `mgm pull`, using push commands instead.
+Same sequential execution and pre-validation as `mver pull`, using push commands instead.
 
 ```bash
-mgm push production@1.4.0
+mver push production@1.4.0
 # Pushing 'fraud-detector@2.1.0': dvc push models/fraud-detector/v2.1.0
 # Pushing 'embedder@0.9.4': dvc push models/embedder/v0.9.4
 # Push complete.
@@ -63,7 +63,7 @@ mgm push production@1.4.0
 
 | Situation | Behavior |
 |---|---|
-| No `mgm.yml` found (`pull`) | Fails with clear message before doing anything |
+| No `mver.yml` found (`pull`) | Fails with clear message before doing anything |
 | Group/version not in registry | Fails before executing any commands |
 | No resolvable command for a model version | Fails before executing any commands, identifying the affected model |
 | A command exits with non-zero | Halts immediately, reports which model failed and the exit code |

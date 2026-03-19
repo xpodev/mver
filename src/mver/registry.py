@@ -23,7 +23,7 @@ def find_registry(start: Path | None = None) -> Path:
             return candidate
     typer.echo(
         "Error: 'models.registry.yml' not found in this directory or any parent.\n"
-        "Hint: run mgm from inside your monorepo.",
+        "Hint: run mver from inside your monorepo.",
         err=True,
     )
     raise typer.Exit(1)

@@ -1,6 +1,6 @@
 # Command Tokens
 
-Tokens are substituted at runtime in pull and push command strings — both in `mgm.config.yml` and in per-version overrides.
+Tokens are substituted at runtime in pull and push command strings — both in `mver.config.yml` and in per-version overrides.
 
 ---
 
@@ -80,4 +80,4 @@ Resolves to:
 - Token substitution is purely textual — no escaping or quoting is applied
 - Tokens that are not present in the command string are silently ignored
 - Commands are executed as shell subprocesses from the **monorepo root**
-- MGM does not validate or interpret command content — it executes as-is and forwards all stdout/stderr to the terminal
+- MVER does not validate or interpret command content — it executes as-is and forwards all stdout/stderr to the terminal

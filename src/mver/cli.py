@@ -1,4 +1,4 @@
-"""Root Typer app for mgm."""
+"""Root Typer app for mver."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,17 +6,17 @@ from typing import Annotated, Optional
 
 import typer
 
-from mgm.commands.app_cmd import app_cmd_app
-from mgm.commands.group import group_app
-from mgm.commands.model import model_app
-from mgm.config import find_config, load_config, save_config
-from mgm.executor import resolve_command, run_command, substitute_tokens
-from mgm.registry import find_registry, load_registry
-from mgm.schema import get_group, get_group_version, get_model_version, get_models
-from mgm.semver_util import validate_semver
+from mver.commands.app_cmd import app_cmd_app
+from mver.commands.group import group_app
+from mver.commands.model import model_app
+from mver.config import find_config, load_config, save_config
+from mver.executor import resolve_command, run_command, substitute_tokens
+from mver.registry import find_registry, load_registry
+from mver.schema import get_group, get_group_version, get_model_version, get_models
+from mver.semver_util import validate_semver
 
 app = typer.Typer(
-    name="mgm",
+    name="mver",
     help="Model Group Manager — lock-file registry for ML model versions.",
     no_args_is_help=True,
 )
@@ -25,7 +25,7 @@ app.add_typer(group_app, name="group")
 app.add_typer(app_cmd_app, name="app")
 
 # ---------------------------------------------------------------------------
-# mgm where
+# mver where
 # ---------------------------------------------------------------------------
 
 
@@ -37,7 +37,7 @@ def where() -> None:
 
 
 # ---------------------------------------------------------------------------
-# mgm validate
+# mver validate
 # ---------------------------------------------------------------------------
 
 
@@ -104,7 +104,7 @@ def validate() -> None:
 
 
 # ---------------------------------------------------------------------------
-# mgm diff
+# mver diff
 # ---------------------------------------------------------------------------
 
 
@@ -162,7 +162,7 @@ def diff(
 
 
 # ---------------------------------------------------------------------------
-# mgm pull
+# mver pull
 # ---------------------------------------------------------------------------
 
 
@@ -172,11 +172,11 @@ def pull() -> None:
     from ruamel.yaml import YAML
 
     cwd = Path.cwd()
-    app_cfg_path = cwd / "mgm.yml"
+    app_cfg_path = cwd / "mver.yml"
     if not app_cfg_path.exists():
         typer.echo(
-            "Error: 'mgm.yml' not found in current directory.\n"
-            "Run 'mgm app use <group@version>' first.",
+            "Error: 'mver.yml' not found in current directory.\n"
+            "Run 'mver app use <group@version>' first.",
             err=True,
         )
         raise typer.Exit(1)
@@ -188,7 +188,7 @@ def pull() -> None:
     gname = app_cfg.get("group")
     ver = str(app_cfg.get("version", ""))
     if not gname or not ver:
-        typer.echo("Error: mgm.yml is missing 'group' or 'version'.", err=True)
+        typer.echo("Error: mver.yml is missing 'group' or 'version'.", err=True)
         raise typer.Exit(1)
 
     reg_path = find_registry(cwd)
@@ -226,7 +226,7 @@ def pull() -> None:
 
 
 # ---------------------------------------------------------------------------
-# mgm push
+# mver push
 # ---------------------------------------------------------------------------
 
 
@@ -276,7 +276,7 @@ def push(
 
 
 # ---------------------------------------------------------------------------
-# mgm config (inline sub-commands)
+# mver config (inline sub-commands)
 # ---------------------------------------------------------------------------
 
 config_app = typer.Typer(help="Manage global config.", no_args_is_help=True)
@@ -290,26 +290,26 @@ config_app.add_typer(config_set_app, name="set")
 def config_set_pull(
     command: Annotated[str, typer.Argument(help="The pull command template")],
 ) -> None:
-    """Set the global pull_command in mgm.config.yml."""
+    """Set the global pull_command in mver.config.yml."""
     reg_path = find_registry()
     cfg = load_config(reg_path)
     cfg["pull_command"] = command
     save_config(reg_path, cfg)
     typer.echo(f"Set pull_command: {command}")
-    typer.echo("Reminder: commit mgm.config.yml to git.")
+    typer.echo("Reminder: commit mver.config.yml to git.")
 
 
 @config_set_app.command("push-command")
 def config_set_push(
     command: Annotated[str, typer.Argument(help="The push command template")],
 ) -> None:
-    """Set the global push_command in mgm.config.yml."""
+    """Set the global push_command in mver.config.yml."""
     reg_path = find_registry()
     cfg = load_config(reg_path)
     cfg["push_command"] = command
     save_config(reg_path, cfg)
     typer.echo(f"Set push_command: {command}")
-    typer.echo("Reminder: commit mgm.config.yml to git.")
+    typer.echo("Reminder: commit mver.config.yml to git.")
 
 
 @config_app.command("show")
@@ -318,7 +318,7 @@ def config_show() -> None:
     reg_path = find_registry()
     cfg = load_config(reg_path)
     if not cfg:
-        typer.echo("(no global config — mgm.config.yml not found or empty)")
+        typer.echo("(no global config — mver.config.yml not found or empty)")
         return
     for key, val in cfg.items():
         typer.echo(f"{key}: {val}")

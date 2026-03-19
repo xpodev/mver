@@ -23,7 +23,7 @@ def resolve_command(
     if not cmd:
         typer.echo(
             f"Error: no {key} configured for model '{model_name}@{model_version_str}' "
-            f"and no global fallback in mgm.config.yml.",
+            f"and no global fallback in mver.config.yml.",
             err=True,
         )
         raise typer.Exit(1)

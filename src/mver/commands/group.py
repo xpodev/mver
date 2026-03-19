@@ -1,4 +1,4 @@
-"""Commands: mgm group ..."""
+"""Commands: mver group ..."""
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -6,15 +6,15 @@ from typing import Annotated, List, Optional
 
 import typer
 
-from mgm.registry import load_registry, save_registry
-from mgm.schema import (
+from mver.registry import load_registry, save_registry
+from mver.schema import (
     get_group,
     get_group_version,
     get_model_version,
     get_models,
     latest_group_version,
 )
-from mgm.semver_util import is_greater_than, validate_semver
+from mver.semver_util import is_greater_than, validate_semver
 
 group_app = typer.Typer(help="Manage model groups.", no_args_is_help=True)
 

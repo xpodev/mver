@@ -1,4 +1,4 @@
-"""Tests for mgm pull and mgm push commands."""
+"""Tests for mver pull and mver push commands."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,13 +7,13 @@ import pytest
 from ruamel.yaml import YAML
 from typer.testing import CliRunner
 
-from mgm.cli import app
+from mver.cli import app
 
 _yaml = YAML()
 
 
 def _write_app_cfg(path: Path, group: str, version: str) -> None:
-    with open(path / "mgm.yml", "w") as f:
+    with open(path / "mver.yml", "w") as f:
         _yaml.dump({"group": group, "version": version}, f)
 
 
@@ -26,13 +26,13 @@ def test_pull_executes_command(
 ) -> None:
     _write_app_cfg(app_dir, "production", "1.0.0")
     monkeypatch.chdir(app_dir)
-    mock_run = mocker.patch("mgm.executor.subprocess.run", return_value=mocker.Mock(returncode=0))
+    mock_run = mocker.patch("mver.executor.subprocess.run", return_value=mocker.Mock(returncode=0))
     result = runner.invoke(app, ["pull"])
     assert result.exit_code == 0, result.output
     assert mock_run.call_count == 2  # two models
 
 
-def test_pull_no_mgm_yml_fails(
+def test_pull_no_mver_yml_fails(
     monorepo: Path,
     app_dir: Path,
     runner: CliRunner,
@@ -41,7 +41,7 @@ def test_pull_no_mgm_yml_fails(
     monkeypatch.chdir(app_dir)
     result = runner.invoke(app, ["pull"])
     assert result.exit_code == 1
-    assert "mgm.yml" in result.output
+    assert "mver.yml" in result.output
 
 
 def test_pull_uses_token_substitution(
@@ -53,7 +53,7 @@ def test_pull_uses_token_substitution(
 ) -> None:
     _write_app_cfg(app_dir, "production", "1.0.0")
     monkeypatch.chdir(app_dir)
-    mock_run = mocker.patch("mgm.executor.subprocess.run", return_value=mocker.Mock(returncode=0))
+    mock_run = mocker.patch("mver.executor.subprocess.run", return_value=mocker.Mock(returncode=0))
     runner.invoke(app, ["pull"])
     calls = [str(c.args[0]) for c in mock_run.call_args_list]
     # The global config is "dvc pull {path}" — path should be substituted
@@ -69,7 +69,7 @@ def test_pull_command_failure_halts(
 ) -> None:
     _write_app_cfg(app_dir, "production", "1.0.0")
     monkeypatch.chdir(app_dir)
-    mocker.patch("mgm.executor.subprocess.run", return_value=mocker.Mock(returncode=1))
+    mocker.patch("mver.executor.subprocess.run", return_value=mocker.Mock(returncode=1))
     result = runner.invoke(app, ["pull"])
     assert result.exit_code == 1
     assert "exited with code" in result.output
@@ -82,7 +82,7 @@ def test_push_executes_command(
     mocker,
 ) -> None:
     monkeypatch.chdir(monorepo)
-    mock_run = mocker.patch("mgm.executor.subprocess.run", return_value=mocker.Mock(returncode=0))
+    mock_run = mocker.patch("mver.executor.subprocess.run", return_value=mocker.Mock(returncode=0))
     result = runner.invoke(app, ["push", "production@1.0.0"])
     assert result.exit_code == 0, result.output
     assert mock_run.call_count == 2
@@ -122,10 +122,10 @@ def test_pull_no_command_fails_before_executing(
         yml.dump(reg, f)
     app_subdir = tmp_path / "app"
     app_subdir.mkdir()
-    with open(app_subdir / "mgm.yml", "w") as f:
+    with open(app_subdir / "mver.yml", "w") as f:
         yml.dump({"group": "g1", "version": "1.0.0"}, f)
     monkeypatch.chdir(app_subdir)
-    mock_run = mocker.patch("mgm.executor.subprocess.run")
+    mock_run = mocker.patch("mver.executor.subprocess.run")
     result = runner.invoke(app, ["pull"])
     assert result.exit_code == 1
     mock_run.assert_not_called()

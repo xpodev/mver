@@ -47,5 +47,5 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Check mgm is runnable
-        run: uv run mgm --help
+      - name: Check mver is runnable
+        run: uv run mver --help

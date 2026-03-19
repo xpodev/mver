@@ -4,12 +4,12 @@ Manage an app's declared dependency on a model group. Run these from inside the 
 
 ---
 
-## `mgm app use`
+## `mver app use`
 
-Write or update `mgm.yml` in the current directory to declare which group version this app depends on.
+Write or update `mver.yml` in the current directory to declare which group version this app depends on.
 
 ```bash
-mgm app use <group-name>@<version>
+mver app use <group-name>@<version>
 ```
 
 **Fails if:**
@@ -23,22 +23,22 @@ mgm app use <group-name>@<version>
 
 ```bash
 cd apps/fraud-service
-mgm app use production@1.4.0
-# Writes mgm.yml:
+mver app use production@1.4.0
+# Writes mver.yml:
 #   group: production
 #   version: "1.4.0"
 ```
 
-Commit the generated `mgm.yml` to git so the declared version is tracked alongside the app's source code.
+Commit the generated `mver.yml` to git so the declared version is tracked alongside the app's source code.
 
 ---
 
-## `mgm app show`
+## `mver app show`
 
-Read the local `mgm.yml` and print the fully resolved model versions and artifact paths.
+Read the local `mver.yml` and print the fully resolved model versions and artifact paths.
 
 ```bash
-mgm app show
+mver app show
 ```
 
 **Example output:**
@@ -51,24 +51,24 @@ App uses group 'production@1.4.0':
   embedder                       0.9.4           models/embedder/v0.9.4
 ```
 
-**Fails if** no `mgm.yml` is found in the current directory.
+**Fails if** no `mver.yml` is found in the current directory.
 
 ---
 
-## `mgm app check`
+## `mver app check`
 
-Validate that the group and version declared in `mgm.yml` still exist in the registry. Exits with a non-zero code on failure.
+Validate that the group and version declared in `mver.yml` still exist in the registry. Exits with a non-zero code on failure.
 
 ```bash
-mgm app check
+mver app check
 ```
 
-Intended for **CI pipelines** to catch stale `mgm.yml` declarations early.
+Intended for **CI pipelines** to catch stale `mver.yml` declarations early.
 
 **Example — valid:**
 
 ```bash
-mgm app check
+mver app check
 # OK: 'production@1.4.0' is valid.
 # Exit code: 0
 ```
@@ -76,7 +76,7 @@ mgm app check
 **Example — stale:**
 
 ```bash
-mgm app check
+mver app check
 # Error: version '1.4.0' does not exist in group 'production' in registry.
 # Exit code: 1
 ```

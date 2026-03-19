@@ -1,4 +1,4 @@
-"""Commands: mgm model version ..."""
+"""Commands: mver model version ..."""
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -6,9 +6,9 @@ from typing import Annotated, Optional
 
 import typer
 
-from mgm.registry import load_registry, save_registry
-from mgm.schema import get_model, get_model_version, group_versions_referencing_model_version
-from mgm.semver_util import validate_semver
+from mver.registry import load_registry, save_registry
+from mver.schema import get_model, get_model_version, group_versions_referencing_model_version
+from mver.semver_util import validate_semver
 
 version_app = typer.Typer(help="Manage model versions.", no_args_is_help=True)
 

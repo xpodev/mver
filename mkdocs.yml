@@ -1,8 +1,8 @@
-site_name: MGM — Model Group Manager
+site_name: MVER — Model Group Manager
 site_description: CLI lock-file registry for ML model versions in a monorepo
-site_url: https://xpodev.github.io/mgm
-repo_url: https://github.com/xpodev/mgm
-repo_name: xpodev/mgm
+site_url: https://xpodev.github.io/mver
+repo_url: https://github.com/xpodev/mver
+repo_name: xpodev/mver
 edit_uri: edit/main/docs/
 
 theme:
@@ -87,4 +87,4 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/xpodev/mgm
+      link: https://github.com/xpodev/mver

@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from ruamel.yaml import YAML
 
-from mgm.registry import find_registry, init_empty_registry, load_registry, save_registry
+from mver.registry import find_registry, init_empty_registry, load_registry, save_registry
 
 _yaml = YAML()
 

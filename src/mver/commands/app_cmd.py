@@ -1,4 +1,4 @@
-"""Commands: mgm app ..."""
+"""Commands: mver app ..."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,12 +7,12 @@ from typing import Annotated
 import typer
 from ruamel.yaml import YAML
 
-from mgm.registry import find_registry, load_registry
-from mgm.schema import get_group, get_group_version, get_model_version
+from mver.registry import find_registry, load_registry
+from mver.schema import get_group, get_group_version, get_model_version
 
 app_cmd_app = typer.Typer(help="Manage app model group declarations.", no_args_is_help=True)
 
-APP_CONFIG_FILENAME = "mgm.yml"
+APP_CONFIG_FILENAME = "mver.yml"
 _yaml = YAML()
 _yaml.default_flow_style = False
 
@@ -22,7 +22,7 @@ def _load_app_config(cwd: Path) -> dict:
     if not app_cfg.exists():
         typer.echo(
             f"Error: '{APP_CONFIG_FILENAME}' not found in {cwd}.\n"
-            "Run 'mgm app use <group@version>' first.",
+            "Run 'mver app use <group@version>' first.",
             err=True,
         )
         raise typer.Exit(1)
@@ -40,7 +40,7 @@ def _save_app_config(cwd: Path, data: dict) -> None:
 def app_use(
     group_version: Annotated[str, typer.Argument(help="group@version to use")],
 ) -> None:
-    """Write or update mgm.yml in the current directory."""
+    """Write or update mver.yml in the current directory."""
     if "@" not in group_version:
         typer.echo("Error: expected 'group@version' format.", err=True)
         raise typer.Exit(1)
@@ -71,7 +71,7 @@ def app_use(
 
     _save_app_config(cwd, {"group": gname, "version": ver})
     typer.echo(f"Set app to use '{gname}@{ver}'.")
-    typer.echo("Reminder: commit mgm.yml to git.")
+    typer.echo("Reminder: commit mver.yml to git.")
 
 
 @app_cmd_app.command("show")
@@ -82,7 +82,7 @@ def app_show() -> None:
     gname = app_cfg.get("group")
     ver = app_cfg.get("version")
     if not gname or not ver:
-        typer.echo("Error: mgm.yml is missing 'group' or 'version'.", err=True)
+        typer.echo("Error: mver.yml is missing 'group' or 'version'.", err=True)
         raise typer.Exit(1)
 
     reg_path = find_registry(cwd)
@@ -104,7 +104,7 @@ def app_show() -> None:
 
 @app_cmd_app.command("check")
 def app_check() -> None:
-    """Validate that the group/version in mgm.yml exists in the registry. Exits 1 on failure."""
+    """Validate that the group/version in mver.yml exists in the registry. Exits 1 on failure."""
     cwd = Path.cwd()
     app_cfg = _load_app_config(cwd)
     gname = app_cfg.get("group")

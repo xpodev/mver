@@ -9,32 +9,32 @@
 
 ## Install as a CLI Tool
 
-The recommended way to install MGM globally is with `uv tool`:
+The recommended way to install MVER globally is with `uv tool`:
 
 ```bash
-uv tool install git+https://github.com/xpodev/mgm
+uv tool install git+https://github.com/xpodev/mver
 ```
 
-After installation, `mgm` is available system-wide:
+After installation, `mver` is available system-wide:
 
 ```bash
-mgm --help
+mver --help
 ```
 
 ---
 
 ## Add to a Monorepo
 
-To pin MGM as a dev dependency inside your monorepo:
+To pin MVER as a dev dependency inside your monorepo:
 
 ```bash
-uv add --dev mgm
+uv add --dev mver
 ```
 
 Then run it via:
 
 ```bash
-uv run mgm --help
+uv run mver --help
 ```
 
 ---
@@ -42,10 +42,10 @@ uv run mgm --help
 ## Install from Source
 
 ```bash
-git clone https://github.com/xpodev/mgm
-cd mgm
+git clone https://github.com/xpodev/mver
+cd mver
 uv sync --all-groups
-uv run mgm --help
+uv run mver --help
 ```
 
 ---
@@ -54,8 +54,8 @@ uv run mgm --help
 
 ```bash
 # Should print the version
-mgm --version
+mver --version
 
 # From inside a monorepo with a registry file
-mgm where
+mver where
 ```

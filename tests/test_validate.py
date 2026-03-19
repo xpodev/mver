@@ -1,4 +1,4 @@
-"""Tests for mgm validate command."""
+"""Tests for mver validate command."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,7 +7,7 @@ import pytest
 from ruamel.yaml import YAML
 from typer.testing import CliRunner
 
-from mgm.cli import app
+from mver.cli import app
 
 _yaml = YAML()
 
@@ -34,7 +34,7 @@ def test_validate_missing_model_version(tmp_path: Path, runner: CliRunner, monke
             }
         },
     }
-    (tmp_path / "mgm.config.yml").write_text("pull_command: dvc pull {path}\npush_command: dvc push {path}\n")
+    (tmp_path / "mver.config.yml").write_text("pull_command: dvc pull {path}\npush_command: dvc push {path}\n")
     with open(tmp_path / "models.registry.yml", "w") as f:
         _yaml.dump(reg, f)
     monkeypatch.chdir(tmp_path)

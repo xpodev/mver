@@ -30,17 +30,17 @@ Groups act like a lock file: they give a single version string that represents a
 
 ## App
 
-An **app** is any package in the monorepo that declares a dependency on a group version via a local `mgm.yml` file. It does not need to know individual model versions — it only tracks the group version.
+An **app** is any package in the monorepo that declares a dependency on a group version via a local `mver.yml` file. It does not need to know individual model versions — it only tracks the group version.
 
 ```
 monorepo/
 ├── models.registry.yml      ← source of truth
-├── mgm.config.yml           ← global pull/push backend
+├── mver.config.yml           ← global pull/push backend
 ├── apps/
 │   ├── fraud-service/
-│   │   └── mgm.yml          ← group: production, version: "1.4.0"
+│   │   └── mver.yml          ← group: production, version: "1.4.0"
 │   └── recommender/
-│       └── mgm.yml          ← group: staging, version: "0.2.0"
+│       └── mver.yml          ← group: staging, version: "0.2.0"
 ```
 
 ---

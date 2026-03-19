@@ -4,12 +4,12 @@ Manage models and their versions in the registry.
 
 ---
 
-## `mgm model add`
+## `mver model add`
 
 Register a new model with no versions yet.
 
 ```bash
-mgm model add <name> [--description TEXT]
+mver model add <name> [--description TEXT]
 ```
 
 | Argument | Required | Description |
@@ -22,18 +22,18 @@ mgm model add <name> [--description TEXT]
 **Example:**
 
 ```bash
-mgm model add fraud-detector --description "Detects fraudulent transactions"
-mgm model add embedder --description "Text embedding model"
+mver model add fraud-detector --description "Detects fraudulent transactions"
+mver model add embedder --description "Text embedding model"
 ```
 
 ---
 
-## `mgm model list`
+## `mver model list`
 
 List all registered models with descriptions and version counts.
 
 ```bash
-mgm model list
+mver model list
 ```
 
 **Example output:**
@@ -47,18 +47,18 @@ embedder                       Text embedding model                            1
 
 ---
 
-## `mgm model remove`
+## `mver model remove`
 
 Remove a model from the registry.
 
 ```bash
-mgm model remove <name>
+mver model remove <name>
 ```
 
 **Fails if** the model is referenced by any group version. The error lists all affected groups.
 
 ```bash
-mgm model remove old-classifier
+mver model remove old-classifier
 # Error: model 'old-classifier' is referenced by:
 #   production@1.3.0
 #   staging@0.2.0
@@ -66,12 +66,12 @@ mgm model remove old-classifier
 
 ---
 
-## `mgm model version add`
+## `mver model version add`
 
 Register a new version of an existing model.
 
 ```bash
-mgm model version add <model-name> <version> \
+mver model version add <model-name> <version> \
   --path <path> \
   [--pull-command TEXT] \
   [--push-command TEXT] \
@@ -97,27 +97,27 @@ mgm model version add <model-name> <version> \
 
 ```bash
 # Simple version using global config for pull/push
-mgm model version add fraud-detector 2.1.0 \
+mver model version add fraud-detector 2.1.0 \
   --path models/fraud-detector/v2.1.0 \
   --created-by jane@company.com
 
 # Version with its own pull/push commands
-mgm model version add embedder 1.0.0 \
+mver model version add embedder 1.0.0 \
   --path models/embedder/v1.0.0 \
   --pull-command "./scripts/pull_from_hf.sh {model} {version}" \
   --push-command "./scripts/push_to_hf.sh {model} {version}"
 ```
 
-If `--pull-command` or `--push-command` are omitted, the version inherits from the global `mgm.config.yml` at runtime — nothing is written to the registry entry for those fields.
+If `--pull-command` or `--push-command` are omitted, the version inherits from the global `mver.config.yml` at runtime — nothing is written to the registry entry for those fields.
 
 ---
 
-## `mgm model version list`
+## `mver model version list`
 
 List all registered versions of a model.
 
 ```bash
-mgm model version list <model-name>
+mver model version list <model-name>
 ```
 
 **Example output:**
@@ -138,12 +138,12 @@ Versions of 'fraud-detector':
 
 ---
 
-## `mgm model version remove`
+## `mver model version remove`
 
 Remove a model version from the registry.
 
 ```bash
-mgm model version remove <model-name> <version>
+mver model version remove <model-name> <version>
 ```
 
 **Fails if** the version is referenced by any group version. The error lists all affected groups.

@@ -1,13 +1,13 @@
-"""Commands: mgm model ..."""
+"""Commands: mver model ..."""
 from __future__ import annotations
 
 from typing import Annotated, Optional
 
 import typer
 
-from mgm.commands.version import version_app
-from mgm.registry import load_registry, save_registry
-from mgm.schema import get_model, get_models, group_versions_referencing_model
+from mver.commands.version import version_app
+from mver.registry import load_registry, save_registry
+from mver.schema import get_model, get_models, group_versions_referencing_model
 
 model_app = typer.Typer(help="Manage models.", no_args_is_help=True)
 model_app.add_typer(version_app, name="version")

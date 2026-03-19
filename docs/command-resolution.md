@@ -1,6 +1,6 @@
 # Command Resolution
 
-When executing `mgm pull` or `mgm push`, MGM determines the command to run for each model version using the following priority order.
+When executing `mver pull` or `mver push`, MVER determines the command to run for each model version using the following priority order.
 
 ---
 
@@ -11,7 +11,7 @@ When executing `mgm pull` or `mgm push`, MGM determines the command to run for e
         │
         │  (if absent)
         ▼
-2. pull_command / push_command in mgm.config.yml
+2. pull_command / push_command in mver.config.yml
         │
         │  (if absent)
         ▼
@@ -21,14 +21,14 @@ When executing `mgm pull` or `mgm push`, MGM determines the command to run for e
 This means:
 
 - **Per-version overrides always win.** If a model version declares its own command, the global config is ignored for that version.
-- **The global config is the fallback.** Most versions will inherit from `mgm.config.yml`, keeping the registry clean.
-- **Neither present → hard failure.** MGM will not silently skip a model. It reports exactly which version has no command configured and stops before running anything.
+- **The global config is the fallback.** Most versions will inherit from `mver.config.yml`, keeping the registry clean.
+- **Neither present → hard failure.** MVER will not silently skip a model. It reports exactly which version has no command configured and stops before running anything.
 
 ---
 
 ## Validation Happens Upfront
 
-For both `pull` and `push`, MGM resolves **all** model versions' commands before executing any of them. If any version has no resolvable command, the entire operation fails immediately with a list of affected versions.
+For both `pull` and `push`, MVER resolves **all** model versions' commands before executing any of them. If any version has no resolvable command, the entire operation fails immediately with a list of affected versions.
 
 This prevents partial pulls/pushes caused by misconfiguration discovered mid-run.
 
@@ -61,4 +61,4 @@ push_command: "dvc push {path}"
 
 ## Changing the Global Config Retroactively
 
-Because commands are resolved at **execution time**, updating `mgm.config.yml` automatically affects all model versions that don't have their own override — including versions registered in the past. No registry rewrite is needed.
+Because commands are resolved at **execution time**, updating `mver.config.yml` automatically affects all model versions that don't have their own override — including versions registered in the past. No registry rewrite is needed.

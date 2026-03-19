@@ -1,4 +1,4 @@
-"""Tests for mgm diff command."""
+"""Tests for mver diff command."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,7 +7,7 @@ import pytest
 from ruamel.yaml import YAML
 from typer.testing import CliRunner
 
-from mgm.cli import app
+from mver.cli import app
 
 _yaml = YAML()
 
@@ -91,7 +91,7 @@ def test_diff_missing_version_fails(tmp_path: Path, runner: CliRunner, monkeypat
 
 
 def test_diff_where(monorepo: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
-    """mgm where should print the registry path."""
+    """mver where should print the registry path."""
     monkeypatch.chdir(monorepo)
     result = runner.invoke(app, ["where"])
     assert result.exit_code == 0
