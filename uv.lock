@@ -3,7 +3,7 @@ revision = 3
 requires-python = ">=3.11"
 
 [manifest]
-constraints = [{ name = "click", specifier = "<8.3.0" }]
+constraints = [{ name = "click", specifier = "<=8.2.1" }]
 
 [[package]]
 name = "annotated-doc"
