@@ -1,23 +1,23 @@
-from mver.api import (
+from resver.api import (
     AppConfig,
     GlobalConfig,
     Group,
     GroupVersion,
-    Model,
-    ModelVersion,
+    Resource,
+    ResourceVersion,
     Registry,
     ResolvedApp,
-    ResolvedModel,
+    ResolvedResource,
 )
 
 __all__ = [
     "Registry",
     "AppConfig",
     "GlobalConfig",
-    "Model",
-    "ModelVersion",
+    "Resource",
+    "ResourceVersion",
     "Group",
     "GroupVersion",
     "ResolvedApp",
-    "ResolvedModel",
+    "ResolvedResource",
 ]

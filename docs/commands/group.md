@@ -1,34 +1,34 @@
-# Group Commands
+﻿# Group Commands
 
-Manage model groups and their released versions.
+Manage resource groups and their released versions.
 
 ---
 
-## `mver group create`
+## `resver group create`
 
 Create a new named group with no versions yet.
 
 ```bash
-mver group create <group-name>
+resver group create <group-name>
 ```
 
 **Fails if** a group with that name already exists.
 
 ```bash
-mver group create production
-mver group create staging
+resver group create production
+resver group create staging
 ```
 
 ---
 
-## `mver group release`
+## `resver group release`
 
-Create a new version of a group, pinning specific model versions.
+Create a new version of a group, pinning specific resource versions.
 
 ```bash
-mver group release <group-name> <version> \
+resver group release <group-name> <version> \
   [--description TEXT] \
-  [--model name=version] ...
+  [--resource name=version] ...
 ```
 
 | Argument | Required | Description |
@@ -36,40 +36,40 @@ mver group release <group-name> <version> \
 | `group-name` | Yes | Name of an existing group |
 | `version` | Yes | Semver version string |
 | `--description` | No | Description of this release |
-| `--model name=version` | No | Pin a model version (repeatable) |
+| `--resource name=version` | No | Pin a resource version (repeatable) |
 
-For any registered model not covered by a `--model` flag, MVER prompts interactively.
+For any registered resource not covered by a `--resource` flag, RESVER prompts interactively.
 
 **Validates before writing:**
 
 - `version` is valid semver and strictly greater than the current latest version for the group
 - `version` does not already exist in the group
-- All specified model versions exist in the registry
+- All specified resource versions exist in the registry
 - All validations pass before anything is written
 
 **Examples:**
 
 ```bash
 # Fully specified (good for scripts and CI)
-mver group release production 1.4.0 \
+resver group release production 1.4.0 \
   --description "Q1 release" \
-  --model fraud-detector=2.1.0 \
-  --model embedder=0.9.4
+  --resource fraud-detector=2.1.0 \
+  --resource embedder=0.9.4
 
-# Interactive — prompts for each model not specified
-mver group release staging 0.3.0
+# Interactive — prompts for each resource not specified
+resver group release staging 0.3.0
 # > Version for 'fraud-detector': 2.1.0
 # > Version for 'embedder': 1.0.0-beta
 ```
 
 ---
 
-## `mver group list`
+## `resver group list`
 
 List all groups and their latest version.
 
 ```bash
-mver group list
+resver group list
 ```
 
 **Example output:**
@@ -83,22 +83,22 @@ staging                        0.2.0
 
 ---
 
-## `mver group show`
+## `resver group show`
 
 Show all versions of a group, or the details of a specific version.
 
 ```bash
 # All versions
-mver group show <group-name>
+resver group show <group-name>
 
 # Specific version
-mver group show <group-name>@<version>
+resver group show <group-name>@<version>
 ```
 
 **Example — all versions:**
 
 ```bash
-mver group show production
+resver group show production
 ```
 
 ```
@@ -116,7 +116,7 @@ Group: production
 **Example — specific version:**
 
 ```bash
-mver group show production@1.4.0
+resver group show production@1.4.0
 ```
 
 ```
@@ -125,7 +125,7 @@ Group version: production@1.4.0
   created_by:  jane@company.com
   description: Q1 release
 
-  Model           Version
+  resource           Version
   fraud-detector  2.1.0
   embedder        0.9.4
 ```

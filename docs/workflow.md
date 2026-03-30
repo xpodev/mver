@@ -1,6 +1,6 @@
-# Workflow Example
+﻿# Workflow Example
 
-A complete end-to-end example of using MVER in a monorepo.
+A complete end-to-end example of using RESVER in a monorepo.
 
 ---
 
@@ -10,36 +10,36 @@ Run once at the monorepo root to configure the storage backend:
 
 ```bash
 # Configure global commands (DVC in this example)
-mver config set pull-command "dvc pull {path}"
-mver config set push-command "dvc push {path}"
+resver config set pull-command "dvc pull {path}"
+resver config set push-command "dvc push {path}"
 
 # Commit the config
-git add mver.config.yml
-git commit -m "chore: add mver global config"
+git add .resver/config.yml
+git commit -m "chore: add resver global config"
 ```
 
 ---
 
-## Registering Models
+## Registering resources
 
 ```bash
-# Register models (no versions yet)
-mver model add fraud-detector --description "Detects fraudulent transactions"
-mver model add embedder --description "Text embedding model"
+# Register resources (no versions yet)
+resver resource add fraud-detector --description "Detects fraudulent transactions"
+resver resource add embedder --description "Text embedding resource"
 
 # Register the first versions after training
-mver model version add fraud-detector 1.0.0 \
-  --path models/fraud-detector/v1.0.0 \
+resver resource version add fraud-detector 1.0.0 \
+  --path resources/fraud-detector/v1.0.0 \
   --created-by jane@company.com
 
-mver model version add embedder 0.9.0 \
-  --path models/embedder/v0.9.0 \
+resver resource version add embedder 0.9.0 \
+  --path resources/embedder/v0.9.0 \
   --created-by jane@company.com
 
-# Push model artifacts to storage
-mver push production@1.0.0   # (after creating the group below)
+# Push resource artifacts to storage
+resver push production@1.0.0   # (after creating the group below)
 
-git add models.registry.yml
+git add .resver/registry.yml
 git commit -m "feat: register fraud-detector v1.0.0 and embedder v0.9.0"
 ```
 
@@ -48,14 +48,14 @@ git commit -m "feat: register fraud-detector v1.0.0 and embedder v0.9.0"
 ## Creating the First Group Release
 
 ```bash
-mver group create production
+resver group create production
 
-mver group release production 1.0.0 \
+resver group release production 1.0.0 \
   --description "Initial production group" \
-  --model fraud-detector=1.0.0 \
-  --model embedder=0.9.0
+  --resource fraud-detector=1.0.0 \
+  --resource embedder=0.9.0
 
-git add models.registry.yml
+git add .resver/registry.yml
 git commit -m "feat: release production@1.0.0"
 ```
 
@@ -63,44 +63,44 @@ git commit -m "feat: release production@1.0.0"
 
 ## Apps Consuming the Group
 
-Each app that needs model artifacts declares which group version it depends on:
+Each app that needs resource artifacts declares which group version it depends on:
 
 ```bash
 cd apps/fraud-service
-mver app use production@1.0.0
-git add mver.yml
-git commit -m "chore: use production@1.0.0 models"
+resver app use production@1.0.0
+git add .resver/app.yml
+git commit -m "chore: use production@1.0.0 resources"
 ```
 
-To pull model files locally for development:
+To pull resource files locally for development:
 
 ```bash
 cd apps/fraud-service
-mver pull
+resver pull
 ```
 
 ---
 
-## Releasing a New Model Version
+## Releasing a New resource Version
 
-When a new model is trained and ready:
+When a new resource is trained and ready:
 
 ```bash
 # Register the new version
-mver model version add fraud-detector 2.0.0 \
-  --path models/fraud-detector/v2.0.0 \
+resver resource version add fraud-detector 2.0.0 \
+  --path resources/fraud-detector/v2.0.0 \
   --created-by jane@company.com
 
 # Release a new group version that picks it up
-mver group release production 1.1.0 \
+resver group release production 1.1.0 \
   --description "Upgraded fraud detector" \
-  --model fraud-detector=2.0.0 \
-  --model embedder=0.9.0        # unchanged
+  --resource fraud-detector=2.0.0 \
+  --resource embedder=0.9.0        # unchanged
 
-# Push the new model artifact
-mver push production@1.1.0
+# Push the new resource artifact
+resver push production@1.1.0
 
-git add models.registry.yml
+git add .resver/registry.yml
 git commit -m "feat: release production@1.1.0 with fraud-detector v2.0.0"
 ```
 
@@ -112,8 +112,8 @@ Each app opts in to the new version on its own schedule:
 
 ```bash
 cd apps/fraud-service
-mver app use production@1.1.0
-git add mver.yml
+resver app use production@1.1.0
+git add .resver/app.yml
 git commit -m "chore: upgrade to production@1.1.0"
 ```
 
@@ -123,13 +123,13 @@ git commit -m "chore: upgrade to production@1.1.0"
 
 ```bash
 # See what changed between two group versions
-mver diff production@1.0.0 production@1.1.0
+resver diff production@1.0.0 production@1.1.0
 # Diff production@1.0.0 → production@1.1.0:
 #   ~ fraud-detector: 1.0.0 → 2.0.0
 
 # Validate the full registry
-mver validate
+resver validate
 
 # See all group versions
-mver group show production
+resver group show production
 ```

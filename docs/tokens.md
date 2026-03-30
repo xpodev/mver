@@ -1,6 +1,6 @@
-# Command Tokens
+﻿# Command Tokens
 
-Tokens are substituted at runtime in pull and push command strings — both in `mver.config.yml` and in per-version overrides.
+Tokens are substituted at runtime in pull and push command strings — both in `.resver/config.yml` and in per-version overrides.
 
 ---
 
@@ -8,9 +8,9 @@ Tokens are substituted at runtime in pull and push command strings — both in `
 
 | Token | Resolves to |
 |---|---|
-| `{path}` | The `path` field from the specific model version entry |
-| `{model}` | The model's name |
-| `{version}` | The pinned model version string |
+| `{path}` | The `path` field from the specific resource version entry |
+| `{resource}` | The resource's name |
+| `{version}` | The pinned resource version string |
 | `{group}` | The group name being pulled or pushed |
 
 ---
@@ -24,10 +24,10 @@ pull_command: "dvc pull {path}"
 push_command: "dvc push {path}"
 ```
 
-For `fraud-detector@2.1.0` with `path: models/fraud-detector/v2.1.0`:
+For `fraud-detector@2.1.0` with `path: resources/fraud-detector/v2.1.0`:
 
 ```
-dvc pull models/fraud-detector/v2.1.0
+dvc pull resources/fraud-detector/v2.1.0
 ```
 
 ---
@@ -42,15 +42,15 @@ push_command: "aws s3 sync ./{path} s3://my-bucket/{path}"
 Resolves to:
 
 ```
-aws s3 sync s3://my-bucket/models/fraud-detector/v2.1.0 ./models/fraud-detector/v2.1.0
+aws s3 sync s3://my-bucket/resources/fraud-detector/v2.1.0 ./resources/fraud-detector/v2.1.0
 ```
 
 ---
 
-### Custom script (model + version)
+### Custom script (resource + version)
 
 ```yaml
-pull_command: "./scripts/pull_model.sh {model} {version}"
+pull_command: "./scripts/pull_model.sh {resource} {version}"
 ```
 
 Resolves to:
@@ -64,13 +64,13 @@ Resolves to:
 ### Group-aware script
 
 ```yaml
-pull_command: "./scripts/pull.sh {group} {model} {version} {path}"
+pull_command: "./scripts/pull.sh {group} {resource} {version} {path}"
 ```
 
 Resolves to:
 
 ```
-./scripts/pull.sh production fraud-detector 2.1.0 models/fraud-detector/v2.1.0
+./scripts/pull.sh production fraud-detector 2.1.0 resources/fraud-detector/v2.1.0
 ```
 
 ---
@@ -80,4 +80,4 @@ Resolves to:
 - Token substitution is purely textual — no escaping or quoting is applied
 - Tokens that are not present in the command string are silently ignored
 - Commands are executed as shell subprocesses from the **monorepo root**
-- MVER does not validate or interpret command content — it executes as-is and forwards all stdout/stderr to the terminal
+- RESVER does not validate or interpret command content — it executes as-is and forwards all stdout/stderr to the terminal

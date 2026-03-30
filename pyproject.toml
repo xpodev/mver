@@ -1,7 +1,8 @@
 [project]
-name = "mver"
-version = "0.1.0"
+name = "resver"
+dynamic = ["version"]
 description = "Model Group Manager — CLI lock-file registry for ML model versions"
+readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "typer[all]>=0.12",
@@ -10,7 +11,7 @@ dependencies = [
 ]
 
 [project.scripts]
-mver = "mver.cli:app"
+resver = "resver.cli:app"
 
 [dependency-groups]
 dev = [
@@ -20,8 +21,19 @@ dev = [
 ]
 
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
+[tool.hatch.version]
+source = "vcs"
+
+[tool.hatch.build.hooks.vcs]
+version-file = "src/resver/_version.py"
+
 [tool.hatch.build.targets.wheel]
-packages = ["src/mver"]
+packages = ["src/resver"]
+
+[tool.uv]
+constraint-dependencies = [
+  "click<=8.2.1"
+]

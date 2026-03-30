@@ -9,31 +9,31 @@ import typer
 
 def resolve_command(
     action: str,
-    model_name: str,
-    model_version_str: str,
+    resource_name: str,
+    resource_version_str: str,
     version_entry: dict,
     global_config: dict,
 ) -> str:
     """
-    Resolve pull_command or push_command for a model version.
+    Resolve pull_command or push_command for a resource version.
     Priority: version_entry override > global_config > error.
     """
     key = f"{action}_command"
     cmd = (version_entry or {}).get(key) or global_config.get(key)
     if not cmd:
         typer.echo(
-            f"Error: no {key} configured for model '{model_name}@{model_version_str}' "
-            f"and no global fallback in mver.config.yml.",
+            f"Error: no {key} configured for resource '{resource_name}@{resource_version_str}' "
+            f"and no global fallback in .resver/config.yml.",
             err=True,
         )
         raise typer.Exit(1)
     return cmd
 
 
-def substitute_tokens(cmd: str, *, path: str, model: str, version: str, group: str) -> str:
+def substitute_tokens(cmd: str, *, path: str, resource: str, version: str, group: str) -> str:
     return (
         cmd.replace("{path}", path)
-        .replace("{model}", model)
+        .replace("{resource}", resource)
         .replace("{version}", version)
         .replace("{group}", group)
     )

@@ -1,4 +1,4 @@
-"""Tests for mver diff command."""
+﻿"""Tests for resver diff command."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,14 +7,14 @@ import pytest
 from ruamel.yaml import YAML
 from typer.testing import CliRunner
 
-from mver.cli import app
+from resver.cli import app
 
 _yaml = YAML()
 
 
 def _make_registry_with_two_versions(tmp_path: Path) -> Path:
     reg = {
-        "models": {
+        "resources": {
             "fraud-detector": {
                 "versions": {
                     "1.0.0": {"path": "p1"},
@@ -32,16 +32,18 @@ def _make_registry_with_two_versions(tmp_path: Path) -> Path:
             "production": {
                 "versions": {
                     "1.0.0": {
-                        "models": {"fraud-detector": "1.0.0", "embedder": "0.9.0"},
+                        "resources": {"fraud-detector": "1.0.0", "embedder": "0.9.0"},
                     },
                     "2.0.0": {
-                        "models": {"fraud-detector": "2.0.0", "embedder": "0.9.0"},
+                        "resources": {"fraud-detector": "2.0.0", "embedder": "0.9.0"},
                     },
                 }
             }
         },
     }
-    with open(tmp_path / "models.registry.yml", "w") as f:
+    resver_dir = tmp_path / ".resver"
+    resver_dir.mkdir(exist_ok=True)
+    with open(resver_dir / "registry.yml", "w") as f:
         _yaml.dump(reg, f)
     return tmp_path
 
@@ -68,13 +70,15 @@ def test_diff_no_changes(tmp_path: Path, runner: CliRunner, monkeypatch: pytest.
 
 def test_diff_different_groups_fails(tmp_path: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
     reg = {
-        "models": {},
+        "resources": {},
         "groups": {
-            "a": {"versions": {"1.0.0": {"models": {}}}},
-            "b": {"versions": {"1.0.0": {"models": {}}}},
+            "a": {"versions": {"1.0.0": {"resources": {}}}},
+            "b": {"versions": {"1.0.0": {"resources": {}}}},
         },
     }
-    with open(tmp_path / "models.registry.yml", "w") as f:
+    resver_dir = tmp_path / ".resver"
+    resver_dir.mkdir(exist_ok=True)
+    with open(resver_dir / "registry.yml", "w") as f:
         _yaml.dump(reg, f)
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(app, ["diff", "a@1.0.0", "b@1.0.0"])
@@ -91,8 +95,8 @@ def test_diff_missing_version_fails(tmp_path: Path, runner: CliRunner, monkeypat
 
 
 def test_diff_where(monorepo: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
-    """mver where should print the registry path."""
+    """resver where should print the registry path."""
     monkeypatch.chdir(monorepo)
     result = runner.invoke(app, ["where"])
     assert result.exit_code == 0
-    assert "models.registry.yml" in result.output
+    assert "registry.yml" in result.output

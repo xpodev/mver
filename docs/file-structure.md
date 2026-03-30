@@ -1,34 +1,34 @@
-# File Structure
+﻿# File Structure
 
-MVER uses three file types, all plain YAML, all meant to be committed to git.
+RESVER uses three file types, all plain YAML, all meant to be committed to git. All configuration files live inside a `.resver/` directory.
 
 ---
 
-## `models.registry.yml`
+## `.resver/registry.yml`
 
-Lives at the **monorepo root**. Single source of truth for all models, versions, and groups.
+Lives at the **monorepo root** inside the `.resver/` directory. Single source of truth for all resources, versions, and groups.
 
 ```yaml
-models:
+resources:
   fraud-detector:
     description: "Detects fraudulent transactions"
     versions:
       2.1.0:
-        path: "models/fraud-detector/v2.1.0"      # (1)
+        path: "resources/fraud-detector/v2.1.0"      # (1)
         created_at: "2024-01-15T10:30:00Z"
         created_by: "jane@company.com"
       2.0.0:
-        path: "models/fraud-detector/v2.0.0"
+        path: "resources/fraud-detector/v2.0.0"
         created_at: "2023-12-01T09:00:00Z"
         created_by: "john@company.com"
         pull_command: "aws s3 sync s3://legacy/{path} ./{path}"  # (2)
         push_command: "aws s3 sync ./{path} s3://legacy/{path}"
   embedder:
-    description: "Text embedding model"
+    description: "Text embedding resource"
     versions:
       0.9.4:
-        path: "models/embedder/v0.9.4"
-        pull_command: "./scripts/pull_from_hf.sh {model} {version}"  # (3)
+        path: "resources/embedder/v0.9.4"
+        pull_command: "./scripts/pull_from_hf.sh {resource} {version}"  # (3)
 
 groups:
   production:
@@ -37,14 +37,14 @@ groups:
         created_at: "2024-01-15T10:30:00Z"
         created_by: "jane@company.com"
         description: "Q1 release"
-        models:
+        resources:
           fraud-detector: "2.1.0"   # (4)
           embedder: "0.9.4"
       1.3.0:
         created_at: "2024-01-01T09:00:00Z"
         created_by: "john@company.com"
         description: "Initial production group"
-        models:
+        resources:
           fraud-detector: "2.0.0"
           embedder: "0.9.0"
   staging:
@@ -53,24 +53,24 @@ groups:
         created_at: "2024-01-20T14:00:00Z"
         created_by: "jane@company.com"
         description: "Testing new embedder"
-        models:
+        resources:
           fraud-detector: "2.1.0"
           embedder: "1.0.0-beta"
 ```
 
 1. `path` is relative to the monorepo root and substituted into commands via `{path}`
 2. Per-version command overrides take priority over the global config
-3. A model can override only pull, only push, or both
-4. Group versions pin exact model versions by name
+3. A resource can override only pull, only push, or both
+4. Group versions pin exact resource versions by name
 
 !!! note
-    MVER uses [ruamel.yaml](https://yaml.readthedocs.io/en/latest/) for all reads and writes, so hand-written YAML comments are preserved.
+    RESVER uses [ruamel.yaml](https://yaml.readthedocs.io/en/latest/) for all reads and writes, so hand-written YAML comments are preserved.
 
 ---
 
-## `mver.config.yml`
+## `.resver/config.yml`
 
-Lives at the **monorepo root**, alongside `models.registry.yml`. Defines the global fallback pull and push commands used by any model version that does not declare its own.
+Lives at the **monorepo root** inside the `.resver/` directory, alongside `registry.yml`. Defines the global fallback pull and push commands used by any resource version that does not declare its own.
 
 ```yaml
 pull_command: "dvc pull {path}"
@@ -79,29 +79,51 @@ push_command: "dvc push {path}"
 
 **This file should be committed to git** so all team members share the same storage backend configuration.
 
-If the file is absent, `mver pull` and `mver push` still work as long as every model version has its own command override.
+If the file is absent, `resver pull` and `resver push` still work as long as every resource version has its own command override.
 
 ---
 
-## `mver.yml`
+## `.resver/app.yml`
 
-Lives at the **app root** (one per app). Declares which group version this app depends on.
+Lives at the **app root** inside the app's `.resver/` directory (one per app). Declares which group version this app depends on.
 
 ```yaml
 group: production
 version: "1.4.0"
 ```
 
-Generated and updated by `mver app use`. Should be committed to git.
+Generated and updated by `resver app use`. Should be committed to git.
+
+---
+
+## Directory Layout
+
+```
+monorepo-root/
+  .resver/
+    registry.yml      # resource + group registry
+    config.yml        # global pull/push commands
+  apps/
+    fraud-service/
+      .resver/
+        app.yml       # declares: group production@1.4.0
+      src/
+        ...
+    risk-scorer/
+      .resver/
+        app.yml       # declares: group staging@0.2.0
+      src/
+        ...
+```
 
 ---
 
 ## Discovery
 
-MVER finds `models.registry.yml` by walking up from the current working directory, the same convention as git. All commands fail with a clear message if no registry is found.
+RESVER finds `.resver/registry.yml` by walking up from the current working directory, the same convention as git. All commands fail with a clear message if no registry is found.
 
 ```
 $ cd apps/fraud-service/src/handlers
-$ mver where
-/home/user/monorepo/models.registry.yml
+$ resver where
+/home/user/monorepo/.resver/registry.yml
 ```

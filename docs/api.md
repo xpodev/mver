@@ -1,9 +1,9 @@
-# Python API
+﻿# Python API
 
-MVER ships a Python API for reading the registry, config, and app declarations from within your own code — no subprocess calls needed.
+RESVER ships a Python API for reading the registry, config, and app declarations from within your own code — no subprocess calls needed.
 
 ```python
-from mver import Registry, AppConfig, GlobalConfig
+from resver import Registry, AppConfig, GlobalConfig
 
 registry = Registry.find()
 config   = GlobalConfig.load()
@@ -11,18 +11,18 @@ app      = AppConfig.load()
 
 resolved = app.resolve(registry, config)
 
-for name, model in resolved.models.items():
-    print(f"{name} @ {model.version}: {model.path}")
+for name, resource in resolved.resources.items():
+    print(f"{name} @ {resource.version}: {resource.path}")
 ```
 
 ---
 
 ## Installation
 
-The API is part of the `mver` package — no extra install required.
+The API is part of the `resver` package — no extra install required.
 
 ```bash
-uv add mver
+uv add resver
 ```
 
 ---
@@ -31,13 +31,13 @@ uv add mver
 
 | Class | Purpose |
 |---|---|
-| [`Registry`](#registry) | Load and query `models.registry.yml` |
-| [`GlobalConfig`](#globalconfig) | Load `mver.config.yml` |
-| [`AppConfig`](#appconfig) | Load `mver.yml` and resolve models |
-| [`ResolvedApp`](#resolvedapp) | Resolved model set for a specific app |
-| [`ResolvedModel`](#resolvedmodel) | A single resolved model with path and commands |
-| [`Model`](#model) | A registered model entry |
-| [`ModelVersion`](#modelversion) | A specific version of a model |
+| [`Registry`](#registry) | Load and query `.resver/registry.yml` |
+| [`GlobalConfig`](#globalconfig) | Load `.resver/config.yml` |
+| [`AppConfig`](#appconfig) | Load `.resver/app.yml` and resolve resources |
+| [`ResolvedApp`](#resolvedapp) | Resolved resource set for a specific app |
+| [`ResolvedModel`](#resolvedmodel) | A single resolved resource with path and commands |
+| [`resource`](#resource) | A registered resource entry |
+| [`ModelVersion`](#modelversion) | A specific version of a resource |
 | [`Group`](#group) | A registered group entry |
 | [`GroupVersion`](#groupversion) | A specific released version of a group |
 
@@ -45,10 +45,10 @@ uv add mver
 
 ## Registry
 
-The main entry point. Loads and parses `models.registry.yml`.
+The main entry point. Loads and parses `.resver/registry.yml`.
 
 ```python
-from mver import Registry
+from resver import Registry
 
 # Walk up from current working directory (like git)
 registry = Registry.find()
@@ -57,42 +57,42 @@ registry = Registry.find()
 registry = Registry.find(Path(__file__).parent)
 
 # Load from an explicit path
-registry = Registry.load(Path("/monorepo/models.registry.yml"))
+registry = Registry.load(Path("/monorepo/.resver/registry.yml"))
 ```
 
 ### Properties
 
 | Name | Type | Description |
 |---|---|---|
-| `path` | `Path` | Absolute path to `models.registry.yml` |
-| `root` | `Path` | Monorepo root (parent of `models.registry.yml`) |
-| `models` | `dict[str, Model]` | All registered models, keyed by name |
+| `path` | `Path` | Absolute path to `.resver/registry.yml` |
+| `root` | `Path` | Monorepo root (parent of the `.resver/` directory) |
+| `resources` | `dict[str, resource]` | All registered resources, keyed by name |
 | `groups` | `dict[str, Group]` | All registered groups, keyed by name |
 
 ### Methods
 
 ```python
-registry.get_model("fraud-detector")   # -> Model | None
+registry.get_model("fraud-detector")   # -> resource | None
 registry.get_group("production")       # -> Group | None
 
-# Convenience helpers — load mver.config.yml and mver.yml
+# Convenience helpers — load .resver/config.yml and .resver/app.yml
 config = registry.config()             # -> GlobalConfig
-app    = registry.app_config()         # -> AppConfig (reads cwd/mver.yml)
-app    = registry.app_config(app_dir)  # -> AppConfig (reads app_dir/mver.yml)
+app    = registry.app_config()         # -> AppConfig (reads cwd/.resver/app.yml)
+app    = registry.app_config(app_dir)  # -> AppConfig (reads app_dir/.resver/app.yml)
 ```
 
 ### Raises
 
-`FileNotFoundError` — if no `models.registry.yml` is found walking up from `start`.
+`FileNotFoundError` — if no `.resver/registry.yml` is found walking up from `start`.
 
 ---
 
 ## GlobalConfig
 
-Reads `mver.config.yml` from the monorepo root.
+Reads `.resver/config.yml` from the monorepo root.
 
 ```python
-from mver import GlobalConfig
+from resver import GlobalConfig
 
 config = GlobalConfig.load()           # walks up from cwd
 config = GlobalConfig.load(app_dir)    # walks up from app_dir
@@ -103,30 +103,42 @@ config = GlobalConfig.load(app_dir)    # walks up from app_dir
 | `pull_command` | `str \| None` | Global fallback pull command template |
 | `push_command` | `str \| None` | Global fallback push command template |
 
-Returns an instance with `None` values if `mver.config.yml` does not exist.
+Returns an instance with `None` values if `.resver/config.yml` does not exist.
 
 ---
 
 ## AppConfig
 
-Reads `mver.yml` from an app directory.
+Reads `.resver/app.yml` from an app directory. Supports two modes depending on the file contents.
 
 ```python
-from mver import AppConfig
+from resver import AppConfig
 
-app = AppConfig.load()           # reads cwd/mver.yml
-app = AppConfig.load(app_dir)    # reads app_dir/mver.yml
+app = AppConfig.load()           # reads cwd/.resver/app.yml
+app = AppConfig.load(app_dir)    # reads app_dir/.resver/app.yml
 ```
+
+**Group mode attributes** (when `.resver/app.yml` contains `group` + `version`):
 
 | Attribute | Type | Description |
 |---|---|---|
-| `group` | `str` | The declared group name |
-| `version` | `str` | The declared group version |
+| `group` | `str \| None` | The declared group name |
+| `version` | `str \| None` | The declared group version |
+| `resources` | `None` | Always `None` in group mode |
+| `directory` | `Path` | The directory the file was loaded from |
+
+**resource-pin mode attributes** (when `.resver/app.yml` contains `resources`):
+
+| Attribute | Type | Description |
+|---|---|---|
+| `group` | `None` | Always `None` in resource-pin mode |
+| `version` | `None` | Always `None` in resource-pin mode |
+| `resources` | `dict[str, str]` | `{model_name: version_string}` direct pins |
 | `directory` | `Path` | The directory the file was loaded from |
 
 ### `resolve(registry, config=None) -> ResolvedApp`
 
-Resolve full model versions and paths for the declared group version.
+Resolve full resource versions and paths. Works in both modes.
 
 ```python
 resolved = app.resolve(registry)           # commands may be None
@@ -135,25 +147,25 @@ resolved = app.resolve(registry, config)   # commands inherit global fallback
 
 ### Raises
 
-- `FileNotFoundError` — `mver.yml` not found
-- `ValueError` — `mver.yml` missing `group` or `version`
-- `KeyError` — group, version, model, or model version not found in registry
+- `FileNotFoundError` — `.resver/app.yml` not found
+- `ValueError` — `.resver/app.yml` has neither a `resources` key nor both `group` and `version`
+- `KeyError` — group, version, resource, or resource version not found in registry
 
 ---
 
 ## ResolvedApp
 
-The result of `AppConfig.resolve()`. Contains all model versions pinned to the declared group version, with paths and commands already resolved.
+The result of `AppConfig.resolve()`. Contains all resource versions pinned for the app, with paths and commands already resolved.
 
 ```python
 resolved = app.resolve(registry, config)
 
-resolved.group_name   # "production"
-resolved.version      # "2.0.0"
-resolved.models       # dict[str, ResolvedModel]
+resolved.group_name   # "production" (group mode) or None (resource-pin mode)
+resolved.version      # "2.0.0" (group mode) or None (resource-pin mode)
+resolved.resources       # dict[str, ResolvedModel]
 
 # Dict-like access
-model = resolved["fraud-detector"]
+resource = resolved["fraud-detector"]
 
 # Iteration
 for name in resolved:
@@ -167,11 +179,11 @@ print(len(resolved))
 
 ## ResolvedModel
 
-A single model as seen by an app — version pinned, path resolved, pull/push commands resolved from version override or global fallback.
+A single resource as seen by an app — version pinned, path resolved, pull/push commands resolved from version override or global fallback.
 
 | Attribute | Type | Description |
 |---|---|---|
-| `name` | `str` | Model name |
+| `name` | `str` | resource name |
 | `version` | `str` | Pinned version string |
 | `path` | `str` | Artifact path (relative to monorepo root) |
 | `pull_command` | `str \| None` | Resolved pull command (version override → global → `None`) |
@@ -179,28 +191,28 @@ A single model as seen by an app — version pinned, path resolved, pull/push co
 
 ---
 
-## Model
+## resource
 
-A registered model with all its versions.
+A registered resource with all its versions.
 
 ```python
-model = registry.models["fraud-detector"]
+resource = registry.resources["fraud-detector"]
 # or
-model = registry.get_model("fraud-detector")  # returns None if missing
+resource = registry.get_model("fraud-detector")  # returns None if missing
 
-model.name          # "fraud-detector"
-model.description   # "Binary classifier for transaction fraud"
-model.versions      # dict[str, ModelVersion]
-model.latest        # ModelVersion with the highest semver
+resource.name          # "fraud-detector"
+resource.description   # "Binary classifier for transaction fraud"
+resource.versions      # dict[str, ModelVersion]
+resource.latest        # ModelVersion with the highest semver
 
-version = model.get_version("2.0.0")   # ModelVersion | None
+version = resource.get_version("2.0.0")   # ModelVersion | None
 ```
 
 ---
 
 ## ModelVersion
 
-A specific registered version of a model.
+A specific registered version of a resource.
 
 | Attribute | Type | Description |
 |---|---|---|
@@ -238,7 +250,7 @@ A specific released version of a group.
 | Attribute | Type | Description |
 |---|---|---|
 | `version` | `str` | Semver version string |
-| `models` | `dict[str, str]` | `{model_name: version_string}` pins |
+| `resources` | `dict[str, str]` | `{model_name: version_string}` pins |
 | `description` | `str \| None` | Release description |
 | `created_at` | `str \| None` | ISO 8601 timestamp |
 | `created_by` | `str \| None` | Author identifier |
@@ -251,7 +263,7 @@ A specific released version of a group.
 
 ```python
 from pathlib import Path
-from mver import Registry, AppConfig, GlobalConfig
+from resver import Registry, AppConfig, GlobalConfig
 
 APP_DIR = Path(__file__).parent
 
@@ -268,7 +280,7 @@ emb_path = resolved["embedder"].path
 
 ```python
 from pathlib import Path
-from mver import Registry
+from resver import Registry
 
 APP_DIR = Path(__file__).parent
 
@@ -279,18 +291,18 @@ resolved = registry.app_config(APP_DIR).resolve(registry, registry.config())
 ### Browse the registry without an app config
 
 ```python
-from mver import Registry
+from resver import Registry
 
 registry = Registry.find()
 
-# Inspect models
-for name, model in registry.models.items():
-    print(f"{name}: latest={model.latest.version}")
+# Inspect resources
+for name, resource in registry.resources.items():
+    print(f"{name}: latest={resource.latest.version}")
 
 # Inspect groups
 production = registry.get_group("production")
 latest_gv  = production.latest
-print(latest_gv.models)   # {'fraud-detector': '2.0.0', 'embedder': '1.0.0'}
+print(latest_gv.resources)   # {'fraud-detector': '2.0.0', 'embedder': '1.0.0'}
 ```
 
 ### Load a specific group version directly
@@ -298,7 +310,7 @@ print(latest_gv.models)   # {'fraud-detector': '2.0.0', 'embedder': '1.0.0'}
 ```python
 registry = Registry.find()
 gv = registry.groups["production"].get_version("1.0.0")
-for model_name, model_version in gv.models.items():
-    mv = registry.models[model_name].get_version(model_version)
+for model_name, model_version in gv.resources.items():
+    mv = registry.resources[model_name].get_version(model_version)
     print(f"{model_name}@{model_version}: {mv.path}")
 ```

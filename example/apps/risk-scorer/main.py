@@ -1,7 +1,7 @@
-"""
-risk-scorer — example app using the mver Python API.
+﻿"""
+risk-scorer — example app using the resver Python API.
 
-This app uses the 'staging' model group to test pre-release model versions.
+This app uses the 'staging' resource group to test pre-release resource versions.
 It demonstrates using registry.app_config() and registry.config() as
 convenience helpers instead of the standalone AppConfig/GlobalConfig calls.
 
@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from mver import Registry
+from resver import Registry
 
 APP_DIR = Path(__file__).parent
 
@@ -23,17 +23,17 @@ def load_models():
     registry = Registry.find(APP_DIR)
 
     # Convenience helpers on the registry object
-    config = registry.config()                     # loads mver.config.yml
-    app = registry.app_config(APP_DIR)             # loads mver.yml
+    config = registry.config()                     # loads resver.config.yml
+    app = registry.app_config(APP_DIR)             # loads resver.yml
 
     print(f"Registry : {registry.path}")
     print(f"App      : {app.group}@{app.version}\n")
 
     resolved = app.resolve(registry, config)
 
-    print(f"Models for {resolved}:")
-    for name, model in resolved.models.items():
-        print(f"  {name:25s} v{model.version}")
+    print(f"resources for {resolved}:")
+    for name, resource in resolved.resources.items():
+        print(f"  {name:25s} v{resource.version}")
 
     return resolved
 
@@ -41,7 +41,7 @@ def load_models():
 def iterate_all_models(resolved):
     """Show that ResolvedApp supports standard iteration."""
     print("\n--- Iterating resolved app ---")
-    print(f"Total models: {len(resolved)}")
+    print(f"Total resources: {len(resolved)}")
     for model_name in resolved:
         m = resolved[model_name]
         print(f"  {model_name}: path={m.path}")
@@ -51,18 +51,18 @@ def inspect_registry():
     """Show how to browse the registry directly, without an app config."""
     registry = Registry.find(APP_DIR)
 
-    print("\n--- All registered models ---")
-    for name, model in registry.models.items():
-        latest = model.latest
-        print(f"  {name}: {len(model.versions)} version(s), latest={latest.version if latest else 'none'}")
+    print("\n--- All registered resources ---")
+    for name, resource in registry.resources.items():
+        latest = resource.latest
+        print(f"  {name}: {len(resource.versions)} version(s), latest={latest.version if latest else 'none'}")
 
     print("\n--- All groups ---")
     for name, group in registry.groups.items():
         latest = group.latest
         print(f"  {name}: {len(group.versions)} version(s), latest={latest.version if latest else 'none'}")
         if latest:
-            for mname, mver in latest.models.items():
-                print(f"    {mname} @ {mver}")
+            for mname, resver in latest.resources.items():
+                print(f"    {mname} @ {resver}")
 
 
 if __name__ == "__main__":

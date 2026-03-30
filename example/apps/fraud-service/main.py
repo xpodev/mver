@@ -1,9 +1,9 @@
-"""
-fraud-service — example app using the mver Python API.
+﻿"""
+fraud-service — example app using the resver Python API.
 
-This app uses the 'production' model group. It reads mver.yml from its own
-directory, discovers the models.registry.yml by walking up the directory tree,
-and resolves the exact model paths declared for the pinned group version.
+This app uses the 'production' resource group. It reads resver.yml from its own
+directory, discovers the resources.registry.yml by walking up the directory tree,
+and resolves the exact resource paths declared for the pinned group version.
 
 Run from this directory:
     python main.py
@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from mver import AppConfig, GlobalConfig, Registry
+from resver import AppConfig, GlobalConfig, Registry
 
 # The directory that contains this file — used as the app root so the example
 # works regardless of the current working directory.
@@ -20,7 +20,7 @@ APP_DIR = Path(__file__).parent
 
 
 def load_models():
-    """Discover registry + config, load the app declaration, resolve models."""
+    """Discover registry + config, load the app declaration, resolve resources."""
     # --- 1. Load the registry (walks up from APP_DIR) ---
     registry = Registry.find(APP_DIR)
     print(f"Registry: {registry.path}")
@@ -33,18 +33,18 @@ def load_models():
     app = AppConfig.load(APP_DIR)
     print(f"App declares: {app.group}@{app.version}\n")
 
-    # --- 4. Resolve to concrete model versions and paths ---
+    # --- 4. Resolve to concrete resource versions and paths ---
     resolved = app.resolve(registry, config)
-    print(f"Resolved models for {resolved.group_name}@{resolved.version}:")
-    for name, model in resolved.models.items():
-        print(f"  {name:25s} v{model.version:10s}  path={model.path}")
+    print(f"Resolved resources for {resolved.group_name}@{resolved.version}:")
+    for name, resource in resolved.resources.items():
+        print(f"  {name:25s} v{resource.version:10s}  path={resource.path}")
     print()
 
     return resolved
 
 
 def run_inference(resolved):
-    """Demonstrate accessing individual models from the resolved app."""
+    """Demonstrate accessing individual resources from the resolved app."""
     fraud_model = resolved["fraud-detector"]
 
     print("--- Fraud Detector ---")
@@ -54,7 +54,7 @@ def run_inference(resolved):
 
     # In a real app you would load the artifact here, e.g.:
     #   import joblib
-    #   clf = joblib.load(fraud_model.path + "/model.pkl")
+    #   clf = joblib.load(fraud_model.path + "/resource.pkl")
     #   prediction = clf.predict(features)
 
     embedder = resolved["embedder"]
@@ -66,8 +66,8 @@ def run_inference(resolved):
 
     # In a real app:
     #   from sentence_transformers import SentenceTransformer
-    #   model = SentenceTransformer(embedder.path)
-    #   embedding = model.encode(["hello world"])
+    #   resource = SentenceTransformer(embedder.path)
+    #   embedding = resource.encode(["hello world"])
 
 
 if __name__ == "__main__":

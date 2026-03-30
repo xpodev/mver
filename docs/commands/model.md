@@ -1,77 +1,77 @@
-# Model Commands
+﻿# resource Commands
 
-Manage models and their versions in the registry.
+Manage resources and their versions in the registry.
 
 ---
 
-## `mver model add`
+## `resver resource add`
 
-Register a new model with no versions yet.
+Register a new resource with no versions yet.
 
 ```bash
-mver model add <name> [--description TEXT]
+resver resource add <name> [--description TEXT]
 ```
 
 | Argument | Required | Description |
 |---|---|---|
-| `name` | Yes | Unique model name |
-| `--description` | No | Short description of the model |
+| `name` | Yes | Unique resource name |
+| `--description` | No | Short description of the resource |
 
-**Fails if** a model with that name already exists.
+**Fails if** a resource with that name already exists.
 
 **Example:**
 
 ```bash
-mver model add fraud-detector --description "Detects fraudulent transactions"
-mver model add embedder --description "Text embedding model"
+resver resource add fraud-detector --description "Detects fraudulent transactions"
+resver resource add embedder --description "Text embedding resource"
 ```
 
 ---
 
-## `mver model list`
+## `resver resource list`
 
-List all registered models with descriptions and version counts.
+List all registered resources with descriptions and version counts.
 
 ```bash
-mver model list
+resver resource list
 ```
 
 **Example output:**
 
 ```
-Model                          Description                              Versions
+resource                          Description                              Versions
 --------------------------------------------------------------------------------
 fraud-detector                 Detects fraudulent transactions                 2
-embedder                       Text embedding model                            1
+embedder                       Text embedding resource                            1
 ```
 
 ---
 
-## `mver model remove`
+## `resver resource remove`
 
-Remove a model from the registry.
+Remove a resource from the registry.
 
 ```bash
-mver model remove <name>
+resver resource remove <name>
 ```
 
-**Fails if** the model is referenced by any group version. The error lists all affected groups.
+**Fails if** the resource is referenced by any group version. The error lists all affected groups.
 
 ```bash
-mver model remove old-classifier
-# Error: model 'old-classifier' is referenced by:
+resver resource remove old-classifier
+# Error: resource 'old-classifier' is referenced by:
 #   production@1.3.0
 #   staging@0.2.0
 ```
 
 ---
 
-## `mver model version add`
+## `resver resource version add`
 
-Register a new version of an existing model.
+Register a new version of an existing resource.
 
 ```bash
-mver model version add <model-name> <version> \
+resver resource version add <resource-name> <version> \
   --path <path> \
   [--pull-command TEXT] \
   [--push-command TEXT] \
@@ -80,44 +80,44 @@ mver model version add <model-name> <version> \
 
 | Argument | Required | Description |
 |---|---|---|
-| `model-name` | Yes | Name of an existing model |
-| `version` | Yes | Semver version string (e.g. `2.1.0`) |
-| `--path` | Yes | Path to model artifacts (relative to monorepo root) |
+| `resource-name` | Yes | Name of an existing resource |
+| `version` | Yes | Seresver version string (e.g. `2.1.0`) |
+| `--path` | Yes | Path to resource artifacts (relative to monorepo root) |
 | `--pull-command` | No | Override the global pull command for this version |
 | `--push-command` | No | Override the global push command for this version |
 | `--created-by` | No | Author identifier (email, username, etc.) |
 
 **Fails if:**
 
-- `model-name` does not exist in the registry
-- `version` is not valid semver
-- That version already exists for the model
+- `resource-name` does not exist in the registry
+- `version` is not valid seresver
+- That version already exists for the resource
 
 **Examples:**
 
 ```bash
 # Simple version using global config for pull/push
-mver model version add fraud-detector 2.1.0 \
-  --path models/fraud-detector/v2.1.0 \
+resver resource version add fraud-detector 2.1.0 \
+  --path resources/fraud-detector/v2.1.0 \
   --created-by jane@company.com
 
 # Version with its own pull/push commands
-mver model version add embedder 1.0.0 \
-  --path models/embedder/v1.0.0 \
-  --pull-command "./scripts/pull_from_hf.sh {model} {version}" \
-  --push-command "./scripts/push_to_hf.sh {model} {version}"
+resver resource version add embedder 1.0.0 \
+  --path resources/embedder/v1.0.0 \
+  --pull-command "./scripts/pull_from_hf.sh {resource} {version}" \
+  --push-command "./scripts/push_to_hf.sh {resource} {version}"
 ```
 
-If `--pull-command` or `--push-command` are omitted, the version inherits from the global `mver.config.yml` at runtime — nothing is written to the registry entry for those fields.
+If `--pull-command` or `--push-command` are omitted, the version inherits from the global `.resver/config.yml` at runtime — nothing is written to the registry entry for those fields.
 
 ---
 
-## `mver model version list`
+## `resver resource version list`
 
-List all registered versions of a model.
+List all registered versions of a resource.
 
 ```bash
-mver model version list <model-name>
+resver resource version list <resource-name>
 ```
 
 **Example output:**
@@ -125,11 +125,11 @@ mver model version list <model-name>
 ```
 Versions of 'fraud-detector':
   2.1.0
-    path:       models/fraud-detector/v2.1.0
+    path:       resources/fraud-detector/v2.1.0
     created_at: 2024-01-15T10:30:00Z
     created_by: jane@company.com
   2.0.0
-    path:       models/fraud-detector/v2.0.0
+    path:       resources/fraud-detector/v2.0.0
     created_at: 2023-12-01T09:00:00Z
     created_by: john@company.com
     pull:       aws s3 sync s3://legacy/{path} ./{path}
@@ -138,12 +138,12 @@ Versions of 'fraud-detector':
 
 ---
 
-## `mver model version remove`
+## `resver resource version remove`
 
-Remove a model version from the registry.
+Remove a resource version from the registry.
 
 ```bash
-mver model version remove <model-name> <version>
+resver resource version remove <resource-name> <version>
 ```
 
 **Fails if** the version is referenced by any group version. The error lists all affected groups.

@@ -1,4 +1,4 @@
-"""Commands: mver group ..."""
+﻿"""Commands: resver group ..."""
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -6,19 +6,19 @@ from typing import Annotated, List, Optional
 
 import typer
 
-from mver.registry import load_registry, save_registry
-from mver.schema import (
+from resver.registry import load_registry, save_registry
+from resver.schema import (
     get_group,
     get_group_version,
-    get_model_version,
-    get_models,
+    get_resource_version,
+    get_resources,
     latest_group_version,
 )
-from mver.semver_util import is_greater_than, validate_semver
+from resver.semver_util import is_greater_than, validate_semver
 
-group_app = typer.Typer(help="Manage model groups.", no_args_is_help=True)
+group_app = typer.Typer(help="Manage resource groups.", no_args_is_help=True)
 
-_GIT_REMINDER = "Reminder: commit models.registry.yml to git."
+_GIT_REMINDER = "Reminder: commit .resver/registry.yml to git."
 
 
 @group_app.command("create")
@@ -43,12 +43,12 @@ def group_release(
     group_name: Annotated[str, typer.Argument(help="Group name")],
     version: Annotated[str, typer.Argument(help="New semver version")],
     description: Annotated[Optional[str], typer.Option("--description", "-d")] = None,
-    model_pins: Annotated[
+    resource_pins: Annotated[
         Optional[List[str]],
-        typer.Option("--model", help="Pin as name=version (repeatable)"),
+        typer.Option("--resource", help="Pin as name=version (repeatable)"),
     ] = None,
 ) -> None:
-    """Create a new version of a group, pinning model versions."""
+    """Create a new version of a group, pinning resource versions."""
     try:
         validate_semver(version)
     except ValueError as e:
@@ -74,37 +74,37 @@ def group_release(
         )
         raise typer.Exit(1)
 
-    # Parse --model flags
+    # Parse --resource flags
     pinned: dict[str, str] = {}
-    for pin in (model_pins or []):
+    for pin in (resource_pins or []):
         if "=" not in pin:
-            typer.echo(f"Error: --model value must be 'name=version', got '{pin}'.", err=True)
+            typer.echo(f"Error: --resource value must be 'name=version', got '{pin}'.", err=True)
             raise typer.Exit(1)
-        mname, mver = pin.split("=", 1)
-        pinned[mname.strip()] = mver.strip()
+        rname, rversion = pin.split("=", 1)
+        pinned[rname.strip()] = rversion.strip()
 
-    # For each registered model, prompt if not supplied
-    models = get_models(data)
+    # For each registered resource, prompt if not supplied
+    resources = get_resources(data)
     final_pins: dict[str, str] = {}
-    for mname in models:
-        if mname in pinned:
-            final_pins[mname] = pinned[mname]
+    for rname in resources:
+        if rname in pinned:
+            final_pins[rname] = pinned[rname]
         else:
-            chosen = typer.prompt(f"Version for model '{mname}'")
-            final_pins[mname] = chosen.strip()
+            chosen = typer.prompt(f"Version for resource '{rname}'")
+            final_pins[rname] = chosen.strip()
 
     # Validate all pinned versions exist
     errors = []
-    for mname, mver in final_pins.items():
-        if get_model_version(data, mname, mver) is None:
-            errors.append(f"  '{mname}@{mver}' does not exist in the registry")
+    for rname, rversion in final_pins.items():
+        if get_resource_version(data, rname, rversion) is None:
+            errors.append(f"  '{rname}@{rversion}' does not exist in the registry")
     if errors:
-        typer.echo("Error: invalid model versions:\n" + "\n".join(errors), err=True)
+        typer.echo("Error: invalid resource versions:\n" + "\n".join(errors), err=True)
         raise typer.Exit(1)
 
     entry: dict = {
         "created_at": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
-        "models": final_pins,
+        "resources": final_pins,
     }
     if description:
         entry["description"] = description
@@ -157,9 +157,9 @@ def group_show(
             typer.echo(f"  created_at:  {vdata['created_at']}")
         if vdata.get("created_by"):
             typer.echo(f"  created_by:  {vdata['created_by']}")
-        typer.echo("  models:")
-        for mname, mver in (vdata.get("models") or {}).items():
-            typer.echo(f"    {mname}: {mver}")
+        typer.echo("  resources:")
+        for rname, rversion in (vdata.get("resources") or {}).items():
+            typer.echo(f"    {rname}: {rversion}")
     else:
         gname = group_ref
         if get_group(data, gname) is None:
@@ -174,5 +174,5 @@ def group_show(
             desc = vdata.get("description") or ""
             created = vdata.get("created_at") or ""
             typer.echo(f"  {ver}  {created}  {desc}")
-            for mname, mver in (vdata.get("models") or {}).items():
-                typer.echo(f"    {mname}: {mver}")
+            for rname, rversion in (vdata.get("resources") or {}).items():
+                typer.echo(f"    {rname}: {rversion}")

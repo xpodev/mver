@@ -1,4 +1,4 @@
-"""
+﻿"""
 Schema: TypedDicts and helper accessors for registry structures.
 """
 from __future__ import annotations
@@ -6,27 +6,27 @@ from __future__ import annotations
 from typing import Any
 
 
-def get_models(registry: dict) -> dict[str, Any]:
-    return registry.get("models") or {}
+def get_resources(registry: dict) -> dict[str, Any]:
+    return registry.get("resources") or {}
 
 
 def get_groups(registry: dict) -> dict[str, Any]:
     return registry.get("groups") or {}
 
 
-def get_model(registry: dict, name: str) -> dict[str, Any] | None:
-    return get_models(registry).get(name)
+def get_resource(registry: dict, name: str) -> dict[str, Any] | None:
+    return get_resources(registry).get(name)
 
 
 def get_group(registry: dict, name: str) -> dict[str, Any] | None:
     return get_groups(registry).get(name)
 
 
-def get_model_version(registry: dict, model_name: str, version: str) -> dict[str, Any] | None:
-    model = get_model(registry, model_name)
-    if model is None:
+def get_resource_version(registry: dict, resource_name: str, version: str) -> dict[str, Any] | None:
+    resource = get_resource(registry, resource_name)
+    if resource is None:
         return None
-    return (model.get("versions") or {}).get(version)
+    return (resource.get("versions") or {}).get(version)
 
 
 def get_group_version(registry: dict, group_name: str, version: str) -> dict[str, Any] | None:
@@ -36,24 +36,24 @@ def get_group_version(registry: dict, group_name: str, version: str) -> dict[str
     return (group.get("versions") or {}).get(version)
 
 
-def group_versions_referencing_model(registry: dict, model_name: str) -> list[str]:
-    """Return list of 'group@version' strings that reference the given model."""
+def group_versions_referencing_resource(registry: dict, resource_name: str) -> list[str]:
+    """Return list of 'group@version' strings that reference the given resource."""
     refs = []
     for gname, gdata in get_groups(registry).items():
         for ver, vdata in (gdata.get("versions") or {}).items():
-            if model_name in (vdata.get("models") or {}):
+            if resource_name in (vdata.get("resources") or {}):
                 refs.append(f"{gname}@{ver}")
     return refs
 
 
-def group_versions_referencing_model_version(
-    registry: dict, model_name: str, model_version: str
+def group_versions_referencing_resource_version(
+    registry: dict, resource_name: str, resource_version: str
 ) -> list[str]:
-    """Return list of 'group@version' strings that pin the given model version."""
+    """Return list of 'group@version' strings that pin the given resource version."""
     refs = []
     for gname, gdata in get_groups(registry).items():
         for ver, vdata in (gdata.get("versions") or {}).items():
-            if (vdata.get("models") or {}).get(model_name) == model_version:
+            if (vdata.get("resources") or {}).get(resource_name) == resource_version:
                 refs.append(f"{gname}@{ver}")
     return refs
 

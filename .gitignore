@@ -6,8 +6,13 @@ dist/
 wheels/
 *.egg-info
 
+# hatch-vcs generated version file
+src/resver/_version.py
+
 # Virtual environments
 .venv
 
 # MkDocs generated site
 site/
+
+.lh/

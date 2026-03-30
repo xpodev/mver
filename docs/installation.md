@@ -1,4 +1,4 @@
-# Installation
+﻿# Installation
 
 ## Requirements
 
@@ -9,32 +9,32 @@
 
 ## Install as a CLI Tool
 
-The recommended way to install MVER globally is with `uv tool`:
+The recommended way to install RESVER globally is with `uv tool`:
 
 ```bash
-uv tool install git+https://github.com/xpodev/mver
+uv tool install git+https://github.com/xpodev/resver
 ```
 
-After installation, `mver` is available system-wide:
+After installation, `resver` is available system-wide:
 
 ```bash
-mver --help
+resver --help
 ```
 
 ---
 
 ## Add to a Monorepo
 
-To pin MVER as a dev dependency inside your monorepo:
+To pin RESVER as a dev dependency inside your monorepo:
 
 ```bash
-uv add --dev mver
+uv add --dev resver
 ```
 
 Then run it via:
 
 ```bash
-uv run mver --help
+uv run resver --help
 ```
 
 ---
@@ -42,10 +42,10 @@ uv run mver --help
 ## Install from Source
 
 ```bash
-git clone https://github.com/xpodev/mver
-cd mver
+git clone https://github.com/xpodev/resver
+cd resver
 uv sync --all-groups
-uv run mver --help
+uv run resver --help
 ```
 
 ---
@@ -54,8 +54,8 @@ uv run mver --help
 
 ```bash
 # Should print the version
-mver --version
+resver --version
 
 # From inside a monorepo with a registry file
-mver where
+resver where
 ```

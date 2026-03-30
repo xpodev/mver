@@ -47,5 +47,5 @@ jobs:
       - name: Install dependencies
         run: uv sync
 
-      - name: Check mver is runnable
-        run: uv run mver --help
+      - name: Check resver is runnable
+        run: uv run resver --help

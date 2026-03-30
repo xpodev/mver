@@ -1,4 +1,4 @@
-"""Shared fixtures for mver tests."""
+"""Shared fixtures for resver tests."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -7,13 +7,13 @@ import pytest
 from ruamel.yaml import YAML
 from typer.testing import CliRunner
 
-from mver.cli import app
+from resver.cli import app
 
 _yaml = YAML()
 _yaml.default_flow_style = False
 
 MINIMAL_REGISTRY = {
-    "models": {
+    "resources": {
         "fraud-detector": {
             "description": "Detects fraud",
             "versions": {
@@ -39,7 +39,7 @@ MINIMAL_REGISTRY = {
                 "1.0.0": {
                     "created_at": "2024-01-15T10:30:00Z",
                     "description": "Initial production",
-                    "models": {
+                    "resources": {
                         "fraud-detector": "2.1.0",
                         "embedder": "0.9.4",
                     },
@@ -58,11 +58,14 @@ MINIMAL_CONFIG = {
 @pytest.fixture()
 def monorepo(tmp_path: Path) -> Path:
     """Create a temp monorepo root with registry and global config."""
-    reg_path = tmp_path / "models.registry.yml"
+    resver_dir = tmp_path / ".resver"
+    resver_dir.mkdir()
+
+    reg_path = resver_dir / "registry.yml"
     with open(reg_path, "w") as f:
         _yaml.dump(MINIMAL_REGISTRY, f)
 
-    cfg_path = tmp_path / "mver.config.yml"
+    cfg_path = resver_dir / "config.yml"
     with open(cfg_path, "w") as f:
         _yaml.dump(MINIMAL_CONFIG, f)
 
@@ -83,10 +86,12 @@ def runner() -> CliRunner:
 
 
 def write_registry(path: Path, data: dict) -> None:
-    with open(path / "models.registry.yml", "w") as f:
+    resver_dir = path / ".resver"
+    resver_dir.mkdir(exist_ok=True)
+    with open(resver_dir / "registry.yml", "w") as f:
         _yaml.dump(data, f)
 
 
 def read_registry(path: Path) -> dict:
-    with open(path / "models.registry.yml") as f:
+    with open(path / ".resver" / "registry.yml") as f:
         return _yaml.load(f)

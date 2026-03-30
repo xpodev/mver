@@ -1,4 +1,4 @@
-"""Root Typer app for mver."""
+﻿"""Root Typer app for resver."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,60 +6,60 @@ from typing import Annotated, Optional
 
 import typer
 
-from mver.commands.app_cmd import app_cmd_app
-from mver.commands.group import group_app
-from mver.commands.model import model_app
-from mver.config import find_config, load_config, save_config
-from mver.executor import resolve_command, run_command, substitute_tokens
-from mver.registry import find_registry, load_registry
-from mver.schema import get_group, get_group_version, get_model_version, get_models
-from mver.semver_util import validate_semver
+from resver.commands.app_cmd import app_cmd_app
+from resver.commands.group import group_app
+from resver.commands.resource import resource_app
+from resver.config import find_config, load_config, save_config
+from resver.executor import resolve_command, run_command, substitute_tokens
+from resver.registry import find_registry, load_registry
+from resver.schema import get_group, get_group_version, get_resource_version, get_resources
+from resver.semver_util import validate_semver
 
 app = typer.Typer(
-    name="mver",
-    help="Model Group Manager — lock-file registry for ML model versions.",
+    name="resver",
+    help="Resource Group Manager — lock-file registry for resource versions.",
     no_args_is_help=True,
 )
-app.add_typer(model_app, name="model")
+app.add_typer(resource_app, name="resource")
 app.add_typer(group_app, name="group")
 app.add_typer(app_cmd_app, name="app")
 
 # ---------------------------------------------------------------------------
-# mver where
+# resver where
 # ---------------------------------------------------------------------------
 
 
 @app.command("where")
 def where() -> None:
-    """Print the path to models.registry.yml being used."""
+    """Print the path to .resver/registry.yml being used."""
     reg_path = find_registry()
     typer.echo(str(reg_path))
 
 
 # ---------------------------------------------------------------------------
-# mver validate
+# resver validate
 # ---------------------------------------------------------------------------
 
 
 @app.command("validate")
 def validate() -> None:
-    """Validate the entire models.registry.yml for consistency."""
+    """Validate the entire .resver/registry.yml for consistency."""
     registry, reg_path = load_registry()
     global_cfg = load_config(reg_path)
     errors: list[str] = []
 
-    models = registry.get("models") or {}
+    resources = registry.get("resources") or {}
     groups = registry.get("groups") or {}
 
-    # Validate model version semver
-    for mname, mdata in models.items():
-        for ver in (mdata.get("versions") or {}):
+    # Validate resource version semver
+    for rname, rdata in resources.items():
+        for ver in (rdata.get("versions") or {}):
             try:
                 validate_semver(str(ver))
             except ValueError as e:
-                errors.append(f"Model '{mname}' version '{ver}': {e}")
+                errors.append(f"Resource '{rname}' version '{ver}': {e}")
 
-    # Validate group version semver + model version references
+    # Validate group version semver + resource version references
     for gname, gdata in groups.items():
         seen_versions: list[str] = []
         for ver, vdata in (gdata.get("versions") or {}).items():
@@ -72,28 +72,28 @@ def validate() -> None:
                 errors.append(f"Group '{gname}': duplicate version '{ver}'")
             seen_versions.append(str(ver))
 
-            for mname, mver in (vdata.get("models") or {}).items():
-                if mname not in models:
+            for rname, rversion in (vdata.get("resources") or {}).items():
+                if rname not in resources:
                     errors.append(
-                        f"Group '{gname}@{ver}': references unknown model '{mname}'"
+                        f"Group '{gname}@{ver}': references unknown resource '{rname}'"
                     )
-                elif get_model_version(registry, mname, str(mver)) is None:
+                elif get_resource_version(registry, rname, str(rversion)) is None:
                     errors.append(
-                        f"Group '{gname}@{ver}': model '{mname}@{mver}' not in registry"
+                        f"Group '{gname}@{ver}': resource '{rname}@{rversion}' not in registry"
                     )
                 else:
                     # Check command resolution
-                    mv = get_model_version(registry, mname, str(mver))
-                    has_pull = mv.get("pull_command") or global_cfg.get("pull_command")
-                    has_push = mv.get("push_command") or global_cfg.get("push_command")
+                    rv = get_resource_version(registry, rname, str(rversion))
+                    has_pull = rv.get("pull_command") or global_cfg.get("pull_command")
+                    has_push = rv.get("push_command") or global_cfg.get("push_command")
                     if not has_pull:
                         errors.append(
-                            f"Group '{gname}@{ver}': model '{mname}@{mver}' has no pull_command "
+                            f"Group '{gname}@{ver}': resource '{rname}@{rversion}' has no pull_command "
                             "(no version override and no global config)"
                         )
                     if not has_push:
                         errors.append(
-                            f"Group '{gname}@{ver}': model '{mname}@{mver}' has no push_command "
+                            f"Group '{gname}@{ver}': resource '{rname}@{rversion}' has no push_command "
                             "(no version override and no global config)"
                         )
 
@@ -104,7 +104,7 @@ def validate() -> None:
 
 
 # ---------------------------------------------------------------------------
-# mver diff
+# resver diff
 # ---------------------------------------------------------------------------
 
 
@@ -113,7 +113,7 @@ def diff(
     ref_a: Annotated[str, typer.Argument(help="group@version-a")],
     ref_b: Annotated[str, typer.Argument(help="group@version-b")],
 ) -> None:
-    """Show model version changes between two group versions."""
+    """Show resource version changes between two group versions."""
     for ref in (ref_a, ref_b):
         if "@" not in ref:
             typer.echo(f"Error: expected 'group@version' format, got '{ref}'.", err=True)
@@ -138,45 +138,45 @@ def diff(
         typer.echo(f"Error: '{ref_b}' not found in registry.", err=True)
         raise typer.Exit(1)
 
-    models_a: dict = gv_a.get("models") or {}
-    models_b: dict = gv_b.get("models") or {}
-    all_models = sorted(set(list(models_a.keys()) + list(models_b.keys())))
+    resources_a: dict = gv_a.get("resources") or {}
+    resources_b: dict = gv_b.get("resources") or {}
+    all_resources = sorted(set(list(resources_a.keys()) + list(resources_b.keys())))
 
     any_diff = False
-    typer.echo(f"Diff {ref_a} → {ref_b}:")
-    for mname in all_models:
-        ver_a = models_a.get(mname)
-        ver_b = models_b.get(mname)
+    typer.echo(f"Diff {ref_a} -> {ref_b}:")
+    for rname in all_resources:
+        ver_a = resources_a.get(rname)
+        ver_b = resources_b.get(rname)
         if ver_a == ver_b:
             continue
         any_diff = True
         if ver_a is None:
-            typer.echo(f"  + {mname}: (added) → {ver_b}")
+            typer.echo(f"  + {rname}: (added) -> {ver_b}")
         elif ver_b is None:
-            typer.echo(f"  - {mname}: {ver_a} → (removed)")
+            typer.echo(f"  - {rname}: {ver_a} -> (removed)")
         else:
-            typer.echo(f"  ~ {mname}: {ver_a} → {ver_b}")
+            typer.echo(f"  ~ {rname}: {ver_a} -> {ver_b}")
 
     if not any_diff:
         typer.echo("  (no changes)")
 
 
 # ---------------------------------------------------------------------------
-# mver pull
+# resver pull
 # ---------------------------------------------------------------------------
 
 
 @app.command("pull")
 def pull() -> None:
-    """Pull all model artifacts for the current app's declared group version."""
+    """Pull all resource artifacts for the current app's declared resources or group version."""
     from ruamel.yaml import YAML
 
     cwd = Path.cwd()
-    app_cfg_path = cwd / "mver.yml"
+    app_cfg_path = cwd / ".resver" / "app.yml"
     if not app_cfg_path.exists():
         typer.echo(
-            "Error: 'mver.yml' not found in current directory.\n"
-            "Run 'mver app use <group@version>' first.",
+            "Error: '.resver/app.yml' not found in current directory.\n"
+            "Run 'resver app use <group@version>' or 'resver app use --resource name=version'.",
             err=True,
         )
         raise typer.Exit(1)
@@ -185,48 +185,57 @@ def pull() -> None:
     with open(app_cfg_path, "r", encoding="utf-8") as f:
         app_cfg = _yaml.load(f) or {}
 
-    gname = app_cfg.get("group")
-    ver = str(app_cfg.get("version", ""))
-    if not gname or not ver:
-        typer.echo("Error: mver.yml is missing 'group' or 'version'.", err=True)
-        raise typer.Exit(1)
-
     reg_path = find_registry(cwd)
     registry, _ = load_registry(reg_path)
     global_cfg = load_config(reg_path)
-    repo_root = reg_path.parent
+    repo_root = reg_path.parent.parent
 
-    gv = get_group_version(registry, gname, ver)
-    if gv is None:
-        typer.echo(f"Error: '{gname}@{ver}' not found in registry.", err=True)
-        raise typer.Exit(1)
-
-    model_pins: dict = gv.get("models") or {}
+    # Resolve resource pins from either mode
+    if "resources" in app_cfg:
+        # Resource-pin mode
+        resource_pins = {k: str(v) for k, v in (app_cfg["resources"] or {}).items()}
+        group_label = "(direct)"
+    else:
+        # Group mode
+        gname = app_cfg.get("group")
+        ver = str(app_cfg.get("version", ""))
+        if not gname or not ver:
+            typer.echo(
+                "Error: .resver/app.yml must contain either 'resources' or 'group'+'version'.",
+                err=True,
+            )
+            raise typer.Exit(1)
+        gv = get_group_version(registry, gname, ver)
+        if gv is None:
+            typer.echo(f"Error: '{gname}@{ver}' not found in registry.", err=True)
+            raise typer.Exit(1)
+        resource_pins = {k: str(v) for k, v in (gv.get("resources") or {}).items()}
+        group_label = gname
 
     # Validate all commands before executing any
-    for mname, mver in model_pins.items():
-        mv = get_model_version(registry, mname, str(mver))
-        resolve_command("pull", mname, str(mver), mv or {}, global_cfg)
+    for rname, rversion in resource_pins.items():
+        rv = get_resource_version(registry, rname, rversion)
+        resolve_command("pull", rname, rversion, rv or {}, global_cfg)
 
     # Execute
-    for mname, mver in model_pins.items():
-        mv = get_model_version(registry, mname, str(mver)) or {}
-        cmd_template = resolve_command("pull", mname, str(mver), mv, global_cfg)
+    for rname, rversion in resource_pins.items():
+        rv = get_resource_version(registry, rname, rversion) or {}
+        cmd_template = resolve_command("pull", rname, rversion, rv, global_cfg)
         cmd = substitute_tokens(
             cmd_template,
-            path=mv.get("path", ""),
-            model=mname,
-            version=str(mver),
-            group=gname,
+            path=rv.get("path", ""),
+            resource=rname,
+            version=rversion,
+            group=group_label,
         )
-        typer.echo(f"Pulling '{mname}@{mver}': {cmd}")
+        typer.echo(f"Pulling '{rname}@{rversion}': {cmd}")
         run_command(cmd, repo_root)
 
     typer.echo("Pull complete.")
 
 
 # ---------------------------------------------------------------------------
-# mver push
+# resver push
 # ---------------------------------------------------------------------------
 
 
@@ -234,7 +243,7 @@ def pull() -> None:
 def push(
     group_version: Annotated[str, typer.Argument(help="group@version to push")],
 ) -> None:
-    """Push model artifacts for a specific group version."""
+    """Push resource artifacts for a specific group version."""
     if "@" not in group_version:
         typer.echo("Error: expected 'group@version' format.", err=True)
         raise typer.Exit(1)
@@ -244,39 +253,39 @@ def push(
     reg_path = find_registry()
     registry, _ = load_registry(reg_path)
     global_cfg = load_config(reg_path)
-    repo_root = reg_path.parent
+    repo_root = reg_path.parent.parent
 
     gv = get_group_version(registry, gname, ver)
     if gv is None:
         typer.echo(f"Error: '{group_version}' not found in registry.", err=True)
         raise typer.Exit(1)
 
-    model_pins: dict = gv.get("models") or {}
+    resource_pins: dict = gv.get("resources") or {}
 
     # Validate all commands before executing any
-    for mname, mver in model_pins.items():
-        mv = get_model_version(registry, mname, str(mver))
-        resolve_command("push", mname, str(mver), mv or {}, global_cfg)
+    for rname, rversion in resource_pins.items():
+        rv = get_resource_version(registry, rname, str(rversion))
+        resolve_command("push", rname, str(rversion), rv or {}, global_cfg)
 
     # Execute
-    for mname, mver in model_pins.items():
-        mv = get_model_version(registry, mname, str(mver)) or {}
-        cmd_template = resolve_command("push", mname, str(mver), mv, global_cfg)
+    for rname, rversion in resource_pins.items():
+        rv = get_resource_version(registry, rname, str(rversion)) or {}
+        cmd_template = resolve_command("push", rname, str(rversion), rv, global_cfg)
         cmd = substitute_tokens(
             cmd_template,
-            path=mv.get("path", ""),
-            model=mname,
-            version=str(mver),
+            path=rv.get("path", ""),
+            resource=rname,
+            version=str(rversion),
             group=gname,
         )
-        typer.echo(f"Pushing '{mname}@{mver}': {cmd}")
+        typer.echo(f"Pushing '{rname}@{rversion}': {cmd}")
         run_command(cmd, repo_root)
 
     typer.echo("Push complete.")
 
 
 # ---------------------------------------------------------------------------
-# mver config (inline sub-commands)
+# resver config (inline sub-commands)
 # ---------------------------------------------------------------------------
 
 config_app = typer.Typer(help="Manage global config.", no_args_is_help=True)
@@ -290,26 +299,26 @@ config_app.add_typer(config_set_app, name="set")
 def config_set_pull(
     command: Annotated[str, typer.Argument(help="The pull command template")],
 ) -> None:
-    """Set the global pull_command in mver.config.yml."""
+    """Set the global pull_command in .resver/config.yml."""
     reg_path = find_registry()
     cfg = load_config(reg_path)
     cfg["pull_command"] = command
     save_config(reg_path, cfg)
     typer.echo(f"Set pull_command: {command}")
-    typer.echo("Reminder: commit mver.config.yml to git.")
+    typer.echo("Reminder: commit .resver/config.yml to git.")
 
 
 @config_set_app.command("push-command")
 def config_set_push(
     command: Annotated[str, typer.Argument(help="The push command template")],
 ) -> None:
-    """Set the global push_command in mver.config.yml."""
+    """Set the global push_command in .resver/config.yml."""
     reg_path = find_registry()
     cfg = load_config(reg_path)
     cfg["push_command"] = command
     save_config(reg_path, cfg)
     typer.echo(f"Set push_command: {command}")
-    typer.echo("Reminder: commit mver.config.yml to git.")
+    typer.echo("Reminder: commit .resver/config.yml to git.")
 
 
 @config_app.command("show")
@@ -318,7 +327,7 @@ def config_show() -> None:
     reg_path = find_registry()
     cfg = load_config(reg_path)
     if not cfg:
-        typer.echo("(no global config — mver.config.yml not found or empty)")
+        typer.echo("(no global config — .resver/config.yml not found or empty)")
         return
     for key, val in cfg.items():
         typer.echo(f"{key}: {val}")

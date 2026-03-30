@@ -1,4 +1,4 @@
-"""Tests for mver config commands."""
+"""Tests for resver config commands."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from mver.cli import app
+from resver.cli import app
 
 
 def test_config_set_pull_command(monorepo: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -33,7 +33,9 @@ def test_config_show(monorepo: Path, runner: CliRunner, monkeypatch: pytest.Monk
 
 def test_config_show_empty(tmp_path: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
     # Registry without a config file
-    (tmp_path / "models.registry.yml").write_text("models: {}\ngroups: {}\n")
+    resver_dir = tmp_path / ".resver"
+    resver_dir.mkdir()
+    (resver_dir / "registry.yml").write_text("models: {}\ngroups: {}\n")
     monkeypatch.chdir(tmp_path)
     result = runner.invoke(app, ["config", "show"])
     assert result.exit_code == 0

@@ -1,4 +1,4 @@
-"""Tests for mver group commands."""
+﻿"""Tests for resver group commands."""
 from __future__ import annotations
 
 from pathlib import Path
@@ -6,7 +6,7 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from mver.cli import app
+from resver.cli import app
 from tests.conftest import read_registry
 
 
@@ -32,8 +32,8 @@ def test_group_release(monorepo: Path, runner: CliRunner, monkeypatch: pytest.Mo
         [
             "group", "release", "production", "2.0.0",
             "--description", "Next release",
-            "--model", "fraud-detector=2.1.0",
-            "--model", "embedder=0.9.4",
+            "--resource", "fraud-detector=2.1.0",
+            "--resource", "embedder=0.9.4",
         ],
     )
     assert result.exit_code == 0, result.output
@@ -45,7 +45,7 @@ def test_group_release_invalid_semver(monorepo: Path, runner: CliRunner, monkeyp
     monkeypatch.chdir(monorepo)
     result = runner.invoke(
         app,
-        ["group", "release", "production", "bad", "--model", "fraud-detector=2.1.0", "--model", "embedder=0.9.4"],
+        ["group", "release", "production", "bad", "--resource", "fraud-detector=2.1.0", "--resource", "embedder=0.9.4"],
     )
     assert result.exit_code == 1
     assert "not a valid semver" in result.output
@@ -57,22 +57,22 @@ def test_group_release_not_greater_than_latest(monorepo: Path, runner: CliRunner
         app,
         [
             "group", "release", "production", "0.0.1",
-            "--model", "fraud-detector=2.1.0",
-            "--model", "embedder=0.9.4",
+            "--resource", "fraud-detector=2.1.0",
+            "--resource", "embedder=0.9.4",
         ],
     )
     assert result.exit_code == 1
     assert "greater than" in result.output
 
 
-def test_group_release_unknown_model_version_fails(monorepo: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
+def test_group_release_unknown_resource_version_fails(monorepo: Path, runner: CliRunner, monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.chdir(monorepo)
     result = runner.invoke(
         app,
         [
             "group", "release", "production", "2.0.0",
-            "--model", "fraud-detector=99.0.0",
-            "--model", "embedder=0.9.4",
+            "--resource", "fraud-detector=99.0.0",
+            "--resource", "embedder=0.9.4",
         ],
     )
     assert result.exit_code == 1
@@ -85,8 +85,8 @@ def test_group_release_duplicate_version_fails(monorepo: Path, runner: CliRunner
         app,
         [
             "group", "release", "production", "1.0.0",
-            "--model", "fraud-detector=2.1.0",
-            "--model", "embedder=0.9.4",
+            "--resource", "fraud-detector=2.1.0",
+            "--resource", "embedder=0.9.4",
         ],
     )
     assert result.exit_code == 1

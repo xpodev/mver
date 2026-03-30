@@ -1,8 +1,8 @@
-site_name: MVER — Model Group Manager
+site_name: RESVER — Model Group Manager
 site_description: CLI lock-file registry for ML model versions in a monorepo
-site_url: https://xpodev.github.io/mver
-repo_url: https://github.com/xpodev/mver
-repo_name: xpodev/mver
+site_url: https://xpodev.github.io/resver
+repo_url: https://github.com/xpodev/resver
+repo_name: xpodev/resver
 edit_uri: edit/main/docs/
 
 theme:
@@ -88,4 +88,4 @@ plugins:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/xpodev/mver
+      link: https://github.com/xpodev/resver
